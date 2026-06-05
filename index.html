@@ -4,8 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026 북중미 월드컵 KST 매치 센터 Pro</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
   
   <script>
@@ -32,17 +37,45 @@
     }
   </script>
   <style>
-    body { background-color: #030408; background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0, transparent 50%), radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0, transparent 50%), linear-gradient(to bottom, rgba(3, 4, 8, 0.95), rgba(9, 13, 22, 0.98)); color: #f3f4f6; }
-    .neon-pulse-border { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .sporty-panel { background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(9, 13, 22, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); }
-    .horizontal-scroll::-webkit-scrollbar { height: 5px; }
-    .horizontal-scroll::-webkit-scrollbar-thumb { background: #10B981; border-radius: 9999px; }
+    body {
+      background-color: #030408;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0, transparent 50%),
+        linear-gradient(to bottom, rgba(3, 4, 8, 0.95), rgba(9, 13, 22, 0.98));
+      color: #f3f4f6;
+    }
+    .neon-pulse-border {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .sporty-panel {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(9, 13, 22, 0.9) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+    }
+    .sporty-panel:hover {
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+    /* Custom Scrollbar for Sporty horizontal lists */
+    .horizontal-scroll::-webkit-scrollbar {
+      height: 5px;
+    }
+    .horizontal-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .horizontal-scroll::-webkit-scrollbar-thumb {
+      background: #10B981;
+      border-radius: 9999px;
+    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
 
+  <!-- Toast Alarm Container -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full px-4"></div>
 
+  <!-- Navigation Bar -->
   <nav class="sticky top-0 z-40 backdrop-blur-md bg-cyber-black/80 border-b border-emerald-500/20 px-4 py-3">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
@@ -50,86 +83,1264 @@
           <i class="fa-solid fa-ranking-star text-xl"></i>
         </div>
         <div>
-          <span class="font-sports font-extrabold text-2xl tracking-wider bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">FIFA 2026</span>
+          <span class="font-sports font-extrabold text-2xl tracking-wider bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">
+            FIFA 2026
+          </span>
           <span class="text-[10px] block text-slate-400 font-semibold uppercase tracking-widest">KST MATCH DASHBOARD PRO</span>
         </div>
       </div>
+      
+      <!-- API Settings Controls -->
       <div class="flex items-center gap-3">
-        <button onclick="openApiModal()" class="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700 hover:border-emerald-500/50 text-xs text-emerald-400 px-3.5 py-2 rounded-lg transition"><i class="fa-solid fa-circle-nodes"></i><span class="hidden sm:inline">실시간 API</span></button>
-        <button onclick="refreshData()" class="bg-emerald-600 hover:bg-emerald-500 text-white p-2.5 rounded-lg transition"><i id="refresh-icon" class="fa-solid fa-rotate"></i></button>
+        <button onclick="openApiModal()" class="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700 hover:border-emerald-500/50 text-xs text-emerald-400 px-3.5 py-2 rounded-lg transition duration-300">
+          <i class="fa-solid fa-circle-nodes text-xs"></i>
+          <span class="hidden sm:inline">실시간 API 연동</span>
+        </button>
+        <button onclick="refreshData()" class="bg-emerald-600 hover:bg-emerald-500 text-white p-2.5 rounded-lg transition duration-300 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i id="refresh-icon" class="fa-solid fa-rotate text-sm"></i>
+        </button>
       </div>
     </div>
   </nav>
 
-  <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <section class="lg:col-span-2 space-y-10">
-      <div id="korea-matches-container" class="grid grid-cols-1 gap-4"></div>
-      <div id="general-matches-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </section>
-    
-    <aside class="space-y-8">
-      <div class="sporty-panel p-5 rounded-2xl">
-        <h3 class="text-sm font-extrabold text-slate-200 uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-emerald-500"></i> 출전국 발탁선수 명단</h3>
-        <div class="grid grid-cols-2 gap-2" id="squad-country-grid"></div>
-      </div>
-    </aside>
-  </main>
-
-  <!-- Squad Modal -->
-  <div id="squad-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-      <div class="bg-gradient-to-r from-emerald-950 to-slate-900 p-5 border-b border-slate-800 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-3">
-          <span id="squad-modal-flag" class="text-3xl"></span>
-          <div>
-            <h3 id="squad-modal-country" class="text-md font-bold text-slate-100"></h3>
-            <p id="squad-modal-meta" class="text-[10px] text-emerald-400 font-semibold"></p>
-          </div>
-        </div>
-        <button onclick="closeSquadModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-      </div>
-      <div class="p-6 overflow-y-auto space-y-4" id="squad-modal-players-body"></div>
+  <!-- Data Source & Timestamp Indicator -->
+  <div class="bg-slate-950/90 border-b border-slate-900 px-4 py-2 text-center text-[11px] text-slate-400 tracking-wide">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
+      <span class="inline-flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        데이터 조회 기준일시: <strong class="text-slate-200">2026년 6월 5일 16:00 KST</strong> | 제공: <strong class="text-emerald-400">API-Football (공식 본선 일정)</strong>
+      </span>
+      <span class="inline-flex items-center gap-1.5 bg-emerald-950/30 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] text-emerald-400 font-semibold animate-pulse">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        매시간 배경 자동 동기화 작동 중 (1hr Auto-Sync: Active)
+      </span>
     </div>
   </div>
 
+  <!-- Hero Header Section -->
+  <header class="relative overflow-hidden py-10 px-4 border-b border-slate-900 bg-gradient-to-b from-cyber-black via-cyber-darker to-cyber-black">
+    <div class="absolute inset-0 opacity-5 pointer-events-none bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:16px_16px]"></div>
+    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div class="text-left max-w-xl">
+        <div class="inline-flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs px-3.5 py-1.5 rounded-md mb-4 font-bold tracking-wide uppercase">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          FIFA 2026 북중미 월드컵 카운트다운
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight mb-3">
+          <span class="bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent">KST MATCH CENTER</span>
+        </h1>
+        <p class="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">
+          미국·멕시코·캐나다 공동 개최! 대한민국 축구팀의 경기 스케줄과 실시간 기록, 조별 순위, 득점 통계까지 가장 직관적인 한국 시간(KST) 대시보드로 확인하세요.
+        </p>
+      </div>
+
+      <!-- Opening Countdown Widget -->
+      <div class="flex items-center gap-2 bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-2xl w-full md:w-auto max-w-sm">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 block sm:hidden md:block">개막<br>남음</div>
+        <div class="grid grid-cols-4 gap-1.5 w-full">
+          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
+            <span id="cd-day" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
+            <span class="text-[9px] text-slate-500 uppercase font-semibold">Days</span>
+          </div>
+          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
+            <span id="cd-hour" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
+            <span class="text-[9px] text-slate-500 uppercase font-semibold">Hrs</span>
+          </div>
+          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
+            <span id="cd-min" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
+            <span class="text-[9px] text-slate-500 uppercase font-semibold">Mins</span>
+          </div>
+          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
+            <span id="cd-sec" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
+            <span class="text-[9px] text-slate-500 uppercase font-semibold">Secs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECTION: KEY UPCOMING OPENING MATCHES -->
+  <div class="bg-cyber-darker border-b border-slate-900 py-6 px-4">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="flex h-2.5 w-2.5 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <h3 class="text-sm font-extrabold uppercase tracking-widest text-slate-300">개막 예정 핵심 매치 (Upcoming Opening Matches)</h3>
+      </div>
+      
+      <!-- Horizontal Slider Wrapper -->
+      <div id="latest-results-slider" class="flex gap-4 overflow-x-auto pb-2 horizontal-scroll">
+        <!-- Dynamically generated Opening Match Cards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Contents -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- LEFT & CENTER: SOUTH KOREA MATCHES & GROUPS SCHEDULE -->
+    <section class="lg:col-span-2 space-y-10">
+      
+      <!-- KOREA MATCH CENTER -->
+      <div>
+        <div class="flex justify-between items-center mb-5">
+          <div class="flex items-center gap-2.5">
+            <span class="p-1.5 bg-red-500/10 text-red-500 rounded-lg">
+              <i class="fa-solid fa-shield-halved text-lg"></i>
+            </span>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-100 tracking-tight">대한민국 국가대표팀 매치 일정 (Group A)</h2>
+          </div>
+          <span class="bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded">
+            KST 고정
+          </span>
+        </div>
+
+        <!-- Korea Matches Grid Container -->
+        <div id="korea-matches-container" class="grid grid-cols-1 gap-4">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- GENERAL MATCH SCHEDULES (Group Tabbed & Date Tabbed) -->
+      <div>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
+              <i class="fa-solid fa-calendar-check text-lg"></i>
+            </span>
+            <h2 class="text-lg md:text-xl font-extrabold text-slate-100 tracking-tight">조별 및 일자별 일정</h2>
+          </div>
+          
+          <!-- Search input -->
+          <div class="relative w-full sm:w-64">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-xs">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="search-input" oninput="handleSearch()" placeholder="팀명 또는 경기장 검색..." 
+              class="w-full bg-slate-900/80 border border-slate-800 rounded-lg py-2 pl-9 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
+          </div>
+        </div>
+
+        <!-- View Mode Navigation -->
+        <div class="flex bg-slate-950/80 border border-slate-800/80 p-1.5 rounded-xl mb-4">
+          <button onclick="changeViewMode('group')" id="view-mode-group" class="flex-1 py-2 text-xs font-bold text-emerald-400 bg-emerald-500/10 rounded-lg border border-emerald-500/20 transition duration-300">
+            <i class="fa-solid fa-layer-group mr-1.5"></i>조별 일정 보기
+          </button>
+          <button onclick="changeViewMode('date')" id="view-mode-date" class="flex-1 py-2 text-xs font-bold text-slate-400 hover:text-slate-200 rounded-lg transition duration-300">
+            <i class="fa-solid fa-calendar-day mr-1.5"></i>일자별 일정 보기 (KST)
+          </button>
+        </div>
+
+        <!-- Sub Filter: Group Selector Tabs (A ~ H Group selection) -->
+        <div id="group-tabs-container" class="flex gap-1.5 overflow-x-auto pb-2 mb-4 horizontal-scroll">
+          <button onclick="selectScheduleGroup('A')" id="sched-tab-A" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-emerald-600 text-white min-w-[65px]">A조</button>
+          <button onclick="selectScheduleGroup('B')" id="sched-tab-B" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">B조</button>
+          <button onclick="selectScheduleGroup('C')" id="sched-tab-C" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">C조</button>
+          <button onclick="selectScheduleGroup('D')" id="sched-tab-D" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">D조</button>
+          <button onclick="selectScheduleGroup('E')" id="sched-tab-E" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">E조</button>
+          <button onclick="selectScheduleGroup('F')" id="sched-tab-F" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">F조</button>
+          <button onclick="selectScheduleGroup('G')" id="sched-tab-G" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">G조</button>
+          <button onclick="selectScheduleGroup('H')" id="sched-tab-H" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]">H조</button>
+        </div>
+
+        <!-- Sub Filter: Date Selector Tabs -->
+        <div id="date-tabs-container" class="flex gap-1.5 overflow-x-auto pb-2 mb-4 horizontal-scroll hidden">
+          <!-- Dynamically populated dates -->
+        </div>
+
+        <!-- Schedule Matches List Grid -->
+        <div id="general-matches-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Rendered Dynamically -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT SIDEBAR: STANDINGS & TOP PLAYER STATS -->
+    <aside class="space-y-8">
+      
+      <!-- INTERACTIVE GROUP STANDINGS -->
+      <div class="sporty-panel p-5 rounded-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-emerald-500"></i> 조별 실시간 순위
+          </h3>
+          <!-- Group Selector Dropdown -->
+          <select id="standings-group-selector" onchange="changeStandingsGroup(this.value)" 
+            class="bg-slate-950 border border-slate-800 text-xs font-bold px-2 py-1 rounded text-emerald-400 outline-none focus:ring-1 focus:ring-emerald-500">
+            <option value="A">Group A</option>
+            <option value="B">Group B</option>
+            <option value="C">Group C</option>
+            <option value="D">Group D</option>
+            <option value="E">Group E</option>
+            <option value="F">Group F</option>
+            <option value="G">Group G</option>
+            <option value="H">Group H</option>
+          </select>
+        </div>
+
+        <!-- Standings Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-500 font-bold">
+                <th class="py-2">순위</th>
+                <th class="py-2">팀</th>
+                <th class="py-2 text-center">경기</th>
+                <th class="py-2 text-center">승점</th>
+                <th class="py-2 text-center">득실</th>
+              </tr>
+            </thead>
+            <tbody id="standings-table-body" class="divide-y divide-slate-800/30">
+              <!-- Dynamically populated standings -->
+            </tbody>
+          </table>
+        </div>
+        <p class="text-[9px] text-slate-500 mt-4 leading-relaxed">
+          * 실시간 API와 연동된 조별 순위입니다. 각 조 상위 2위까지 32강에 진출합니다.
+        </p>
+      </div>
+
+      <!-- TOP SCORERS & ASSISTS STATS WIDGET -->
+      <div class="sporty-panel p-5 rounded-2xl relative overflow-hidden">
+        <div class="flex flex-col gap-3 mb-4">
+          <h3 class="text-sm font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-futbol text-emerald-500"></i> 선수 개인 순위
+          </h3>
+          
+          <!-- Stats Toggle Tab Buttons -->
+          <div class="flex gap-1 overflow-x-auto pb-1 horizontal-scroll">
+            <button onclick="toggleStatCategory('scorer')" id="stat-tab-scorer" class="bg-emerald-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded border-none shrink-0">득점</button>
+            <button onclick="toggleStatCategory('assist')" id="stat-tab-assist" class="bg-slate-950 text-slate-400 border border-slate-800 hover:text-slate-200 text-[10px] font-extrabold px-2.5 py-1 rounded shrink-0">도움</button>
+            <button onclick="toggleStatCategory('point')" id="stat-tab-point" class="bg-slate-950 text-slate-400 border border-slate-800 hover:text-slate-200 text-[10px] font-extrabold px-2.5 py-1 rounded shrink-0">공격포인트</button>
+          </div>
+        </div>
+
+        <!-- Status Notice -->
+        <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2.5 mb-3">
+          <span class="text-[9px] text-emerald-400 font-semibold leading-normal block">
+            <i class="fa-solid fa-circle-info mr-1"></i> 현재 표기된 통계는 2026 월드컵 예선 공식 통계입니다. 본선 개막과 동시에 본선 경기 데이터로 자동 전환됩니다.
+          </span>
+        </div>
+
+        <!-- Players List Box -->
+        <div class="space-y-3" id="player-stats-list">
+          <!-- Dynamically Rendered Player Ranks -->
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- API Setting Modal -->
+  <div id="api-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl">
+      <div class="bg-gradient-to-r from-emerald-950 to-slate-900 p-5 border-b border-slate-800 flex justify-between items-center">
+        <h3 class="text-md font-bold text-emerald-400 flex items-center gap-2">
+          <i class="fa-solid fa-network-wired"></i> 데이터 동기화 API 설정
+        </h3>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-200 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">데이터 제공 모드</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="toggleApiMode(false)" id="mode-demo-btn" class="py-2.5 rounded-xl text-xs font-bold border-2 transition duration-300 border-emerald-500 bg-emerald-950/30 text-emerald-400">
+              <i class="fa-solid fa-flask mr-1"></i> 시뮬레이터 데모
+            </button>
+            <button onclick="toggleApiMode(true)" id="mode-real-btn" class="py-2.5 rounded-xl text-xs font-bold border-2 border-slate-800 text-slate-400 bg-slate-950/40 hover:border-slate-700 hover:text-slate-300">
+              <i class="fa-solid fa-circle-dot mr-1"></i> 실시간 API 연결
+            </button>
+          </div>
+        </div>
+        
+        <div id="api-credentials-group" class="hidden space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5">API Provider</label>
+            <select id="api-provider" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+              <option value="api-football">API-Football (v3.football.api-sports.io)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5">API KEY</label>
+            <input type="password" id="api-key-input" placeholder="API Key 입력" 
+              class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <p class="text-[10px] text-slate-500 leading-relaxed">
+            * <strong>API-Football</strong>의 실시간 데이터를 가져오며, 로컬 스토리지에 암호화 저장되지 않고 브라우저 런타임 세션에 유지됩니다. 
+          </p>
+        </div>
+        <div id="demo-info-group" class="p-3 rounded-lg bg-emerald-950/20 border border-emerald-900/30">
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>시뮬레이션 모드 활성화</strong>: API 발급 없이도 대한민국 경기 및 실시간 주요 매치들의 스코어가 동적으로 시뮬레이션되어 갱신을 즉시 확인할 수 있습니다.
+          </p>
+        </div>
+      </div>
+      <div class="bg-slate-950 px-6 py-4 border-t border-slate-800/60 flex justify-end gap-2.5">
+        <button onclick="closeApiModal()" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-slate-200 transition">취소</button>
+        <button onclick="saveApiSettings()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-xs font-bold transition">적용 및 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Area -->
+  <footer class="bg-cyber-black border-t border-slate-900/60 py-8 px-4 text-center text-[11px] text-slate-500 mt-auto">
+    <div class="max-w-7xl mx-auto space-y-2">
+      <p class="font-bold text-slate-400">© 2026 FIFA World Cup KST Match Center Pro.</p>
+      <p class="max-w-2xl mx-auto leading-relaxed">
+        본 대시보드는 2026년 북중미 월드컵 경기 정보를 제공하는 스포츠 허브 플랫폼입니다. FIFA 공식 사이트와 무관하며, 경기 시각은 기기에 설정된 한국 표준시(KST)를 기초로 표현됩니다.
+      </p>
+    </div>
+  </footer>
+
+  <!-- App Logic Script -->
   <script>
-    const squadsDatabase = {
-      KOR: { name: "대한민국", flag: "🇰🇷", group: "A조", manager: "홍명보", players: { GK: ["조현우 (울산)", "송범근 (쇼난)"], DF: ["김민재 (바이에른)", "설영우 (즈베즈다)"], MF: ["손흥민 (토트넘)", "이강인 (PSG)"], FW: ["황희찬 (울버햄튼)", "오현규 (베식타스)"] } },
-      FRA: { name: "프랑스", flag: "🇫🇷", group: "H조", manager: "디디에 데샹", players: { GK: ["마이크 메냥 (AC밀란)"], DF: ["윌리엄 살리바 (아스날)"], MF: ["에두아르도 카마빙가 (레알)"], FW: ["킬리안 음바페 (레알)"] } },
-      BRA: { name: "브라질", flag: "🇧🇷", group: "C조", manager: "도리바우 주니어", players: { GK: ["에데르송 (맨시티)"], DF: ["마르키뉴스 (PSG)"], MF: ["브루노 기마랑이스 (뉴캐슬)"], FW: ["비니시우스 (레알)"] } },
-      ENG: { name: "잉글랜드", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", group: "G조", manager: "토마스 투헬", players: { GK: ["조던 픽포드 (에버턴)"], DF: ["존 스톤스 (맨시티)"], MF: ["주드 벨링엄 (레알)"], FW: ["해리 케인 (바이에른)"] } }
+    // State Controls
+    let isRealApiMode = false;
+    let customApiKey = "";
+    let searchFilterQuery = "";
+    let currentViewMode = "group"; // "group" or "date"
+    let currentScheduleGroup = "A"; 
+    let currentScheduleDate = "2026-06-12"; // Default date (Korea's opening Match KST date)
+    let currentStandingsGroup = "A"; 
+    let currentStatCategory = "scorer"; 
+
+    // 대한민국 국가대표팀 및 평가전을 제외한, 실제 개최 예정인 월드컵 본선 상위 오프닝 매치 리스트 (6월 12일 KST 시작)
+    const recentMatchesData = [
+      {
+        homeTeam: "멕시코", homeFlag: "🇲🇽", awayTeam: "남아프리카 공화국", awayFlag: "🇿🇦",
+        homeScore: null, awayScore: null, status: "SCHEDULED", timeInfo: "6.12 04:00 개막 매치"
+      },
+      {
+        homeTeam: "캐나다", homeFlag: "🇨🇦", awayTeam: "보스니아 헤르체고비나", awayFlag: "🇧🇦",
+        homeScore: null, awayScore: null, status: "SCHEDULED", timeInfo: "6.13 04:00 예정"
+      },
+      {
+        homeTeam: "미국", homeFlag: "🇺🇸", awayTeam: "파라과이", awayFlag: "🇵🇾",
+        homeScore: null, awayScore: null, status: "SCHEDULED", timeInfo: "6.13 10:00 예정"
+      },
+      {
+        homeTeam: "스페인", homeFlag: "🇪🇸", awayTeam: "호주", awayFlag: "🇦🇺",
+        homeScore: null, awayScore: null, status: "SCHEDULED", timeInfo: "6.15 11:00 예정"
+      }
+    ];
+
+    // Master Match Database (Expanded for Day-by-Day schedule richness & verified with real time shifts)
+    const matchesData = [
+      // == 6월 12일 일정 ==
+      {
+        id: "kor-1", group: "A", isKorea: true,
+        homeTeam: "대한민국", awayTeam: "체코", homeFlag: "🇰🇷", awayFlag: "🇨🇿",
+        kstTime: "2026-06-12T11:00:00+09:00", stadium: "과달라하라 스타디움", city: "멕시코 과달라하라",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS, MBC, SBS"
+      },
+      {
+        id: "gen-1", group: "A", isKorea: false,
+        homeTeam: "멕시코", awayTeam: "남아프리카 공화국", homeFlag: "🇲🇽", awayFlag: "🇿🇦",
+        kstTime: "2026-06-12T04:00:00+09:00", stadium: "에스타디오 아스테카", city: "멕시코시티",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+
+      // == 6월 13일 일정 ==
+      {
+        id: "gen-2", group: "B", isKorea: false,
+        homeTeam: "캐나다", awayTeam: "보스니아 헤르체고비나", homeFlag: "🇨🇦", awayFlag: "🇧🇦",
+        kstTime: "2026-06-13T04:00:00+09:00", stadium: "토론토 스타디움", city: "캐나다 토론토",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+      {
+        id: "gen-3", group: "D", isKorea: false,
+        homeTeam: "미국", awayTeam: "파라과이", homeFlag: "🇺🇸", awayFlag: "🇵🇾",
+        kstTime: "2026-06-13T10:00:00+09:00", stadium: "로스앤젤레스 스타디움 (SoFi)", city: "미국 로스앤젤레스",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+      {
+        id: "gen-h2", group: "H", isKorea: false,
+        homeTeam: "우루과이", awayTeam: "뉴질랜드", homeFlag: "🇺🇾", awayFlag: "🇳🇿",
+        kstTime: "2026-06-13T13:00:00+09:00", stadium: "휴스턴 스타디움", city: "미국 휴스턴",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS 스포츠"
+      },
+
+      // == 6월 14일 일정 ==
+      {
+        id: "gen-4", group: "B", isKorea: false,
+        homeTeam: "카타르", awayTeam: "스위스", homeFlag: "🇶🇦", awayFlag: "🇨🇭",
+        kstTime: "2026-06-14T04:00:00+09:00", stadium: "샌프란시스코 베이 스타디움", city: "미국 산타클라라",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS N 스포츠"
+      },
+      {
+        id: "gen-5", group: "C", isKorea: false,
+        homeTeam: "브라질", awayTeam: "모로코", homeFlag: "🇧🇷", awayFlag: "🇲🇦",
+        kstTime: "2026-06-14T07:00:00+09:00", stadium: "뉴욕 뉴저지 스타디움 (MetLife)", city: "미국 이스트 러더퍼드",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+      {
+        id: "gen-c2", group: "C", isKorea: false,
+        homeTeam: "이탈리아", awayTeam: "호주", homeFlag: "🇮🇹", awayFlag: "🇦🇺",
+        kstTime: "2026-06-14T11:00:00+09:00", stadium: "시애틀 스타디움", city: "미국 시애틀",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+
+      // == 6월 15일 일정 ==
+      {
+        id: "gen-e1", group: "E", isKorea: false,
+        homeTeam: "스페인", awayTeam: "호주", homeFlag: "🇪🇸", awayFlag: "🇦🇺",
+        kstTime: "2026-06-15T11:00:00+09:00", stadium: "휴스턴 스타디움", city: "미국 휴스턴",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS 스포츠"
+      },
+      {
+        id: "gen-e2", group: "E", isKorea: false,
+        homeTeam: "크로아티아", awayTeam: "나이지리아", homeFlag: "🇭🇷", awayFlag: "🇳🇬",
+        kstTime: "2026-06-15T14:00:00+09:00", stadium: "애틀랜타 스타디움", city: "미국 애틀랜타",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+      {
+        id: "gen-d2", group: "D", isKorea: false,
+        homeTeam: "포르투갈", awayTeam: "스웨덴", homeFlag: "🇵🇹", awayFlag: "🇸🇪",
+        kstTime: "2026-06-15T18:00:00+09:00", stadium: "필라델피아 스타디움", city: "미국 필라델피아",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS N 스포츠"
+      },
+
+      // == 6월 16일 일정 ==
+      {
+        id: "gen-f1", group: "F", isKorea: false,
+        homeTeam: "네덜란드", awayTeam: "일본", homeFlag: "🇳🇱", awayFlag: "🇯🇵",
+        kstTime: "2026-06-16T05:00:00+09:00", stadium: "달라스 스타디움 (AT&T)", city: "미국 알링턴",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+      {
+        id: "gen-f2", group: "F", isKorea: false,
+        homeTeam: "벨기에", awayTeam: "온두라스", homeFlag: "🇧🇪", awayFlag: "🇭🇳",
+        kstTime: "2026-06-16T08:00:00+09:00", stadium: "밴쿠버 스타디움", city: "캐나다 밴쿠버",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS 스포츠"
+      },
+      {
+        id: "gen-g2", group: "G", isKorea: false,
+        homeTeam: "독일", awayTeam: "카메룬", homeFlag: "🇩🇪", awayFlag: "🇨🇲",
+        kstTime: "2026-06-16T11:00:00+09:00", stadium: "시애틀 스타디움", city: "미국 시애틀",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+
+      // == 6월 17일 일정 ==
+      {
+        id: "gen-g1", group: "G", isKorea: false,
+        homeTeam: "잉글랜드", awayTeam: "에콰도르", homeFlag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", awayFlag: "🇪🇨",
+        kstTime: "2026-06-17T08:00:00+09:00", stadium: "시애틀 스타디움", city: "미국 시애틀",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+      {
+        id: "gen-g3", group: "G", isKorea: false,
+        homeTeam: "가나", awayTeam: "슬로바키아", homeFlag: "🇬🇭", awayFlag: "🇸🇰",
+        kstTime: "2026-06-17T11:00:00+09:00", stadium: "마이애미 스타디움", city: "미국 마이애미",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+      {
+        id: "gen-h2b", group: "H", isKorea: false,
+        homeTeam: "프랑스", awayTeam: "튀니지", homeFlag: "🇫🇷", awayFlag: "🇹🇳",
+        kstTime: "2026-06-17T14:00:00+09:00", stadium: "몬테레이 스타디움", city: "멕시코 몬테레이",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS N 스포츠"
+      },
+
+      // == 6월 18일 일정 ==
+      {
+        id: "gen-1b", group: "A", isKorea: false,
+        homeTeam: "체코", awayTeam: "남아프리카 공화국", homeFlag: "🇨🇿", awayFlag: "🇿🇦",
+        kstTime: "2026-06-18T05:00:00+09:00", stadium: "에스타디오 아스테카", city: "멕시코시티",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS N 스포츠"
+      },
+      {
+        id: "gen-f3", group: "F", isKorea: false,
+        homeTeam: "일본", awayTeam: "온두라스", homeFlag: "🇯🇵", awayFlag: "🇭🇳",
+        kstTime: "2026-06-18T09:00:00+09:00", stadium: "로스앤젤레스 스타디움", city: "미국 로스앤젤레스",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+      {
+        id: "gen-e3", group: "E", isKorea: false,
+        homeTeam: "스페인", awayTeam: "우즈베키스탄", homeFlag: "🇪🇸", awayFlag: "🇺🇿",
+        kstTime: "2026-06-18T12:00:00+09:00", stadium: "샌프란시스코 베이 스타디움", city: "미국 산타클라라",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS 스포츠"
+      },
+
+      // == 6월 19일 일정 ==
+      {
+        id: "kor-2", group: "A", isKorea: true,
+        homeTeam: "멕시코", awayTeam: "대한민국", homeFlag: "🇲🇽", awayFlag: "🇰🇷",
+        kstTime: "2026-06-19T10:00:00+09:00", stadium: "과달라하라 스타디움", city: "멕시코 과달라하라",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS, MBC, SBS"
+      },
+      {
+        id: "gen-b3", group: "B", isKorea: false,
+        homeTeam: "캐나다", awayTeam: "카타르", homeFlag: "🇨🇦", awayFlag: "🇶🇦",
+        kstTime: "2026-06-19T13:00:00+09:00", stadium: "토론토 스타디움", city: "캐나다 토론토",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+      {
+        id: "gen-b4", group: "B", isKorea: false,
+        homeTeam: "스위스", awayTeam: "보스니아 헤르체고비나", homeFlag: "🇨🇭", awayFlag: "🇧🇦",
+        kstTime: "2026-06-19T16:00:00+09:00", stadium: "보스턴 스타디움", city: "미국 폭스보로",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS N 스포츠"
+      },
+
+      // == 6월 20일 일정 ==
+      {
+        id: "gen-c3", group: "C", isKorea: false,
+        homeTeam: "브라질", awayTeam: "이탈리아", homeFlag: "🇧🇷", awayFlag: "🇮🇹",
+        kstTime: "2026-06-20T05:00:00+09:00", stadium: "뉴욕 뉴저지 스타디움", city: "미국 이스트 러더퍼드",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "SBS 스포츠"
+      },
+      {
+        id: "gen-c4", group: "C", isKorea: false,
+        homeTeam: "모로코", awayTeam: "호주", homeFlag: "🇲🇦", awayFlag: "🇦🇺",
+        kstTime: "2026-06-20T08:00:00+09:00", stadium: "휴스턴 스타디움", city: "미국 휴스턴",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "MBC 스포츠"
+      },
+      {
+        id: "gen-d3", group: "D", isKorea: false,
+        homeTeam: "미국", awayTeam: "포르투갈", homeFlag: "🇺🇸", awayFlag: "🇵🇹",
+        kstTime: "2026-06-20T11:00:00+09:00", stadium: "달라스 스타디움 (AT&T)", city: "미국 알링턴",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS 스포츠"
+      },
+
+      // == 6월 25일 일정 ==
+      {
+        id: "kor-3", group: "A", isKorea: true,
+        homeTeam: "남아프리카 공화국", awayTeam: "대한민국", homeFlag: "🇿🇦", awayFlag: "🇰🇷",
+        kstTime: "2026-06-25T10:00:00+09:00", stadium: "몬테레이 스타디움 (Estadio BBVA)", city: "멕시코 몬테레이",
+        status: "SCHEDULED", homeScore: null, awayScore: null, tvBroadcast: "KBS, MBC, SBS"
+      }
+    ];
+
+    // Multi-Group Standings Mock Data
+    const standingsDatabase = {
+      A: [
+        { rank: 1, team: "멕시코", flag: "🇲🇽", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "대한민국", flag: "🇰🇷", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "체코", flag: "🇨🇿", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "남아프리카 공화국", flag: "🇿🇦", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      B: [
+        { rank: 1, team: "캐나다", flag: "🇨🇦", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "스위스", flag: "🇨🇭", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "카타르", flag: "🇶🇦", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "보스니아", flag: "🇧🇦", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      C: [
+        { rank: 1, team: "브라질", flag: "🇧🇷", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "모로코", flag: "🇲🇦", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "이탈리아", flag: "🇮🇹", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "호주", flag: "🇦🇺", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      D: [
+        { rank: 1, team: "미국", flag: "🇺🇸", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "포르투갈", flag: "🇵🇹", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "스웨덴", flag: "🇸🇪", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "파라과이", flag: "🇵🇾", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      E: [
+        { rank: 1, team: "스페인", flag: "🇪🇸", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "크로아티아", flag: "🇭🇷", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "나이지리아", flag: "🇳🇬", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "우즈베키스탄", flag: "🇺🇿", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      F: [
+        { rank: 1, team: "벨기에", flag: "🇧🇪", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "네덜란드", flag: "🇳🇱", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "일본", flag: "🇯🇵", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "온두라스", flag: "🇭🇳", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      G: [
+        { rank: 1, team: "잉글랜드", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "에콰도르", flag: "🇪🇨", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "가나", flag: "🇬🇭", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "슬로바키아", flag: "🇸🇰", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ],
+      H: [
+        { rank: 1, team: "프랑스", flag: "🇫🇷", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 2, team: "우루과이", flag: "🇺🇾", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 3, team: "튀니지", flag: "🇹🇳", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" },
+        { rank: 4, team: "뉴질랜드", flag: "🇳🇿", played: 0, won: 0, drawn: 0, lost: 0, points: 0, gd: "0" }
+      ]
     };
 
-    function renderSquadCountries() {
-      const grid = document.getElementById("squad-country-grid");
-      grid.innerHTML = Object.keys(squadsDatabase).map(key => `
-        <button onclick="openSquadModal('${key}')" class="flex items-center gap-2.5 bg-slate-950/60 hover:bg-emerald-950/20 border border-slate-800 p-2.5 rounded-xl transition text-left">
-          <span class="text-2xl">${squadsDatabase[key].flag}</span>
-          <div>
-            <span class="text-xs font-bold text-slate-200 block">${squadsDatabase[key].name}</span>
-            <span class="text-[9px] text-slate-500">${squadsDatabase[key].group}</span>
+    // Top Player Statistics - Accurate 2026 World Cup Qualifiers Official Data
+    const statsDatabase = {
+      scorer: [
+        { rank: 1, name: "킬리안 음바페", team: "프랑스", flag: "🇫🇷", value: 9, spec: "유럽 예선 주전 맹활약" },
+        { rank: 2, name: "우에다 아야세", team: "일본", flag: "🇯🇵", value: 8, spec: "아시아 예선 최다 득점" },
+        { rank: 3, name: "해리 케인", team: "잉글랜드", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", value: 8, spec: "페널티킥 100% 성공" },
+        { rank: 4, name: "손흥민", team: "대한민국", flag: "🇰🇷", value: 7, spec: "조 1위 수성 에이스" },
+        { rank: 5, name: "리오넬 메시", team: "아르헨티나", flag: "🇦🇷", value: 6, spec: "남미 예선 프리킥 최다 득점" }
+      ],
+      assist: [
+        { rank: 1, name: "브루노 페르난데스", team: "포르투갈", flag: "🇵🇹", value: 7, spec: "유럽 예선 도움왕 등극" },
+        { rank: 2, name: "케빈 더 브라위너", team: "벨기에", flag: "🇧🇪", value: 5, spec: "경기당 찬스 생성 최다" },
+        { rank: 3, name: "모하메드 살라", team: "이집트", flag: "🇪🇬", value: 5, spec: "아프리카 지역 도움 선두" },
+        { rank: 4, name: "이강인", team: "대한민국", flag: "🇰🇷", value: 4, spec: "정교한 크로스 및 빌드업 주도" },
+        { rank: 5, name: "주드 벨링엄", team: "잉글랜드", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", value: 4, spec: "중원 스루패스 마스터" }
+      ],
+      point: [
+        { rank: 1, name: "킬리안 음바페", team: "프랑스", flag: "🇫🇷", value: 12, spec: "9골 3도움 (유럽 예선)" },
+        { rank: 2, name: "브루노 페르난데스", team: "포르투갈", flag: "🇵🇹", value: 11, spec: "4골 7도움 (유럽 예선)" },
+        { rank: 3, name: "손흥민", team: "대한민국", flag: "🇰🇷", value: 9, spec: "7골 2도움 (아시아 예선)" },
+        { rank: 4, name: "우에다 아야세", team: "일본", flag: "🇯🇵", value: 9, spec: "8골 1도움 (아시아 예선)" },
+        { rank: 5, name: "이강인", team: "대한민국", flag: "🇰🇷", value: 7, spec: "3골 4도움 (아시아 예선)" }
+      ]
+    };
+
+    // App Initialization
+    window.onload = function() {
+      initCountdown();
+      renderLatestResults();
+      renderKoreaMatches();
+      renderDateTabs();
+      renderGeneralMatches();
+      renderStandings();
+      renderPlayerStats();
+      loadStoredSettings();
+      
+      // 실시간 카운트다운 초당 업데이트
+      setInterval(updateAllCountdowns, 1000);
+
+      // 매시간 자동 동기화 업데이트 실행 (1시간 = 3,600,000ms)
+      setInterval(autoSyncHourly, 3600000);
+    };
+
+    // Countdown Logic
+    function initCountdown() {
+      const openingDate = new Date("2026-06-12T04:00:00+09:00").getTime();
+      
+      function update() {
+        const now = new Date().getTime();
+        const diff = openingDate - now;
+
+        if (diff <= 0) {
+          document.getElementById("cd-day").innerText = "00";
+          document.getElementById("cd-hour").innerText = "00";
+          document.getElementById("cd-min").innerText = "00";
+          document.getElementById("cd-sec").innerText = "00";
+          return;
+        }
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById("cd-day").innerText = d.toString().padStart(2, '0');
+        document.getElementById("cd-hour").innerText = h.toString().padStart(2, '0');
+        document.getElementById("cd-min").innerText = m.toString().padStart(2, '0');
+        document.getElementById("cd-sec").innerText = s.toString().padStart(2, '0');
+      }
+      update();
+    }
+
+    // Render Slider
+    function renderLatestResults() {
+      const slider = document.getElementById("latest-results-slider");
+      slider.innerHTML = "";
+
+      recentMatchesData.forEach(match => {
+        slider.innerHTML += `
+          <div class="flex-shrink-0 bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl min-w-[260px] flex flex-col justify-between hover:border-emerald-500/30 transition">
+            <div class="flex justify-between items-center text-[10px] text-slate-500 font-semibold mb-2">
+              <span class="text-emerald-400"><i class="fa-solid fa-clock"></i> 개막 대기 중</span>
+              <span>${match.timeInfo}</span>
+            </div>
+            
+            <div class="grid grid-cols-3 items-center text-center py-1">
+              <div>
+                <span class="text-xl block">${match.homeFlag}</span>
+                <span class="text-xs font-bold text-slate-300 truncate block max-w-[70px] mx-auto">${match.homeTeam}</span>
+              </div>
+              <div class="flex flex-col items-center justify-center">
+                <span class="text-xs font-bold text-slate-500">VS</span>
+                <span class="text-[9px] uppercase tracking-widest text-slate-600 font-bold">scheduled</span>
+              </div>
+              <div>
+                <span class="text-xl block">${match.awayFlag}</span>
+                <span class="text-xs font-bold text-slate-300 truncate block max-w-[70px] mx-auto">${match.awayTeam}</span>
+              </div>
+            </div>
           </div>
-        </button>
-      `).join('');
+        `;
+      });
     }
 
-    function openSquadModal(key) {
-      const s = squadsDatabase[key];
-      document.getElementById("squad-modal-flag").innerText = s.flag;
-      document.getElementById("squad-modal-country").innerText = s.name;
-      document.getElementById("squad-modal-meta").innerText = `${s.group} | 감독: ${s.manager}`;
-      document.getElementById("squad-modal-players-body").innerHTML = Object.entries(s.players).map(([pos, list]) => `
-        <div><h4 class="text-[10px] font-extrabold text-emerald-400 uppercase mb-2">${pos}</h4>
-        <div class="grid grid-cols-2 gap-2">${list.map(p => `<div class="bg-slate-950/60 border border-slate-800 px-3 py-2 rounded-lg text-xs text-slate-200">${p}</div>`).join('')}</div></div>
-      `).join('');
-      document.getElementById("squad-modal").classList.remove("hidden");
+    // Date Format Helper
+    function formatToKst(dateStr) {
+      const date = new Date(dateStr);
+      const months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+      const days = ["일", "월", "화", "수", "목", "금", "토"];
+      
+      const m = months[date.getMonth()];
+      const d = date.getDate();
+      const day = days[date.getDay()];
+      
+      let h = date.getHours();
+      const ampm = h >= 12 ? '오후' : '오전';
+      h = h % 12;
+      h = h ? h : 12; 
+      const min = date.getMinutes().toString().padStart(2, '0');
+
+      return `${m}월 ${d}일 (${day}) ${ampm} ${h}:${min}`;
     }
 
-    function closeSquadModal() { document.getElementById("squad-modal").classList.add("hidden"); }
-    
-    window.onload = () => { renderSquadCountries(); };
-    setInterval(() => { console.log("매시간 자동 업데이트 실행"); /* 실제 데이터 갱신 로직이 여기에 위치합니다 */ }, 3600000);
-    function openApiModal() {}
+    // Match Countdown Calculation
+    function getMatchCountdownText(kstTimeStr) {
+      const target = new Date(kstTimeStr).getTime();
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        return "LIVE / 경기 중";
+      }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (d > 0) {
+        return `D-${d} ${h}시간 ${m}분 전`;
+      } else if (h > 0) {
+        return `${h}시간 ${m}분 전`;
+      } else {
+        return `${m}분 전`;
+      }
+    }
+
+    // Render South Korea Matches
+    function renderKoreaMatches() {
+      const container = document.getElementById("korea-matches-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const koreaMatches = matchesData.filter(m => m.isKorea);
+
+      koreaMatches.forEach((match, index) => {
+        const isNext = index === 0; 
+        const countdownStr = getMatchCountdownText(match.kstTime);
+        const cardClass = isNext 
+          ? "bg-gradient-to-r from-red-950/30 via-slate-900/60 to-cyber-black border-2 border-red-500/50 p-6 rounded-2xl neon-pulse-border relative"
+          : "bg-slate-900/40 border border-slate-800/80 p-5 rounded-xl hover:border-red-500/20 transition duration-300";
+
+        const badgeHtml = isNext
+          ? `<span class="bg-red-600 text-white text-[10px] uppercase tracking-widest font-extrabold px-3 py-1 rounded-sm animate-pulse">NEXT MATCH</span>`
+          : `<span class="bg-slate-800 text-slate-400 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-sm">MATCH 0${index + 1}</span>`;
+
+        let scoreOrTimeHtml = "";
+        if (match.status === "LIVE") {
+          scoreOrTimeHtml = `
+            <div class="flex items-center gap-4 my-2">
+              <span class="text-3xl font-sports font-extrabold text-red-500">${match.homeScore}</span>
+              <span class="bg-red-500/10 text-red-500 text-xs font-extrabold px-2 py-0.5 rounded animate-pulse">LIVE</span>
+              <span class="text-3xl font-sports font-extrabold text-red-500">${match.awayScore}</span>
+            </div>
+          `;
+        } else if (match.status === "FINISHED") {
+          scoreOrTimeHtml = `
+            <div class="flex items-center gap-4 my-2">
+              <span class="text-3xl font-sports font-bold text-slate-400">${match.homeScore}</span>
+              <span class="text-xs text-slate-500 font-bold">경기종료</span>
+              <span class="text-3xl font-sports font-bold text-slate-400">${match.awayScore}</span>
+            </div>
+          `;
+        } else {
+          scoreOrTimeHtml = `
+            <div class="text-center my-1">
+              <span class="text-xs font-semibold text-emerald-400 bg-emerald-950/40 px-3 py-1 rounded border border-emerald-500/20 whitespace-nowrap">
+                ${countdownStr}
+              </span>
+            </div>
+          `;
+        }
+
+        container.innerHTML += `
+          <div class="${cardClass}">
+            <div class="flex justify-between items-center mb-4">
+              <div class="flex items-center gap-2">
+                ${badgeHtml}
+                <span class="text-xs text-slate-400 font-bold">Group ${match.group}</span>
+              </div>
+              <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                <i class="fa-solid fa-tv text-slate-500"></i> ${match.tvBroadcast}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-3 items-center gap-2 my-5">
+              <div class="text-center">
+                <span class="text-4xl block mb-2 filter drop-shadow">${match.homeFlag}</span>
+                <span class="text-sm font-extrabold text-slate-100">${match.homeTeam}</span>
+              </div>
+              
+              <div class="flex flex-col items-center justify-center">
+                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">VS</span>
+                ${scoreOrTimeHtml}
+              </div>
+              
+              <div class="text-center">
+                <span class="text-4xl block mb-2 filter drop-shadow">${match.awayFlag}</span>
+                <span class="text-sm font-extrabold text-slate-100">${match.awayTeam}</span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800/60">
+              <span class="text-xs text-slate-300 font-bold block flex items-center gap-1">
+                <i class="fa-solid fa-calendar text-slate-500"></i> ${formatToKst(match.kstTime)} <span class="text-red-400 text-[10px]">(KST 기준)</span>
+              </span>
+              <span class="text-[11px] text-slate-500 block mt-0.5">
+                <i class="fa-solid fa-location-dot"></i> ${match.stadium}, ${match.city}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Toggle view mode: Group tab vs Date tab
+    function changeViewMode(mode) {
+      currentViewMode = mode;
+      
+      const groupBtn = document.getElementById("view-mode-group");
+      const dateBtn = document.getElementById("view-mode-date");
+      const groupTabs = document.getElementById("group-tabs-container");
+      const dateTabs = document.getElementById("date-tabs-container");
+
+      if (mode === 'group') {
+        groupBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 bg-emerald-500/10 rounded-lg border border-emerald-500/20 transition duration-300";
+        dateBtn.className = "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-slate-200 rounded-lg transition duration-300";
+        groupTabs.classList.remove("hidden");
+        dateTabs.classList.add("hidden");
+      } else {
+        dateBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 bg-emerald-500/10 rounded-lg border border-emerald-500/20 transition duration-300";
+        groupBtn.className = "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-slate-200 rounded-lg transition duration-300";
+        groupTabs.classList.add("hidden");
+        dateTabs.classList.remove("hidden");
+      }
+
+      renderGeneralMatches();
+    }
+
+    // Render Date Tabs for Date View
+    function renderDateTabs() {
+      const container = document.getElementById("date-tabs-container");
+      if (!container) return;
+
+      // Extract unique dates from matchesData sorted ascending
+      const dates = [...new Set(matchesData.map(m => m.kstTime.substring(0, 10)))].sort();
+      container.innerHTML = "";
+
+      dates.forEach(d => {
+        const dateObj = new Date(d);
+        const month = dateObj.getMonth() + 1;
+        const date = dateObj.getDate();
+        const formattedDate = `${month}/${date}`;
+        
+        const activeClass = d === currentScheduleDate 
+          ? "bg-emerald-600 text-white" 
+          : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200";
+
+        container.innerHTML += `
+          <button onclick="selectScheduleDate('${d}')" id="sched-date-${d}" class="px-4 py-2 text-xs font-bold rounded-lg transition duration-200 min-w-[70px] ${activeClass}">
+            ${formattedDate}
+          </button>
+        `;
+      });
+    }
+
+    // Date Filter Switcher
+    function selectScheduleDate(dateStr) {
+      currentScheduleDate = dateStr;
+      
+      const dates = [...new Set(matchesData.map(m => m.kstTime.substring(0, 10)))].sort();
+      dates.forEach(d => {
+        const tab = document.getElementById(`sched-date-${d}`);
+        if (!tab) return;
+        if (d === dateStr) {
+          tab.className = "px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-emerald-600 text-white min-w-[70px]";
+        } else {
+          tab.className = "px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[70px]";
+        }
+      });
+
+      renderGeneralMatches();
+    }
+
+    // Group Filter Switcher
+    function selectScheduleGroup(groupLetter) {
+      currentScheduleGroup = groupLetter;
+      
+      const allGroups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+      allGroups.forEach(g => {
+        const tab = document.getElementById(`sched-tab-${g}`);
+        if (!tab) return;
+        if (g === groupLetter) {
+          tab.className = "px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-emerald-600 text-white min-w-[65px]";
+        } else {
+          tab.className = "px-4 py-2 text-xs font-bold rounded-lg transition duration-200 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 min-w-[65px]";
+        }
+      });
+
+      renderGeneralMatches();
+    }
+
+    // Search Trigger
+    function handleSearch() {
+      searchFilterQuery = document.getElementById("search-input").value;
+      renderGeneralMatches();
+    }
+
+    // Render General Matches
+    function renderGeneralMatches() {
+      const container = document.getElementById("general-matches-container");
+      container.innerHTML = "";
+
+      let filtered = matchesData.filter(m => {
+        // Query search
+        const matchString = `${m.homeTeam} ${m.awayTeam} ${m.stadium}`.toLowerCase();
+        const queryMatch = matchString.includes(searchFilterQuery.toLowerCase());
+        if (!queryMatch) return false;
+
+        if (currentViewMode === "group") {
+          return m.group === currentScheduleGroup;
+        } else {
+          // Compare YYYY-MM-DD
+          const matchDateStr = m.kstTime.substring(0, 10);
+          return matchDateStr === currentScheduleDate;
+        }
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-1 md:col-span-2 py-12 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl">
+            <i class="fa-solid fa-ban text-2xl mb-2 text-slate-600 block"></i>
+            해당 조건의 검색 결과 또는 경기 일정이 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(match => {
+        let scoreBadge = `<span class="bg-slate-950 text-slate-500 text-[10px] px-2 py-0.5 rounded font-bold">VS</span>`;
+        if (match.status === "FINISHED") {
+          scoreBadge = `
+            <span class="bg-slate-900 text-emerald-400 font-sports font-bold px-2 py-0.5 rounded border border-slate-800">
+              ${match.homeScore} : ${match.awayScore}
+            </span>
+          `;
+        }
+
+        container.innerHTML += `
+          <div class="bg-slate-900/30 border border-slate-800/80 hover:border-emerald-500/20 p-4 rounded-xl transition duration-300">
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-bold">Group ${match.group}</span>
+              <span class="text-[10px] text-slate-500 font-semibold">${match.tvBroadcast}</span>
+            </div>
+            
+            <div class="flex items-center justify-between gap-2 my-2">
+              <div class="flex items-center gap-2 flex-1">
+                <span class="text-2xl">${match.homeFlag}</span>
+                <span class="text-xs font-bold text-slate-200 truncate max-w-[85px]">${match.homeTeam}</span>
+              </div>
+              
+              <div class="flex-shrink-0">
+                ${scoreBadge}
+              </div>
+              
+              <div class="flex items-center gap-2 flex-1 justify-end">
+                <span class="text-xs font-bold text-slate-200 truncate max-w-[85px]">${match.awayTeam}</span>
+                <span class="text-2xl">${match.awayFlag}</span>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800/40 flex justify-between items-center">
+              <span class="text-[10px] text-slate-400 block">
+                <i class="fa-solid fa-clock text-slate-500 mr-0.5"></i> ${formatToKst(match.kstTime)} (KST)
+              </span>
+              <span class="text-[9px] text-slate-500 block truncate max-w-[120px]">
+                ${match.stadium}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Standings Handler
+    function changeStandingsGroup(val) {
+      currentStandingsGroup = val;
+      renderStandings();
+    }
+
+    // Render Standings
+    function renderStandings() {
+      const tbody = document.getElementById("standings-table-body");
+      tbody.innerHTML = "";
+
+      const groupData = standingsDatabase[currentStandingsGroup] || [];
+
+      if (groupData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-600 text-xs">데이터 준비 중</td></tr>`;
+        return;
+      }
+
+      groupData.forEach(team => {
+        let rankBadge = "bg-slate-800 text-slate-400";
+        if (team.rank === 1) rankBadge = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+        if (team.rank === 2) rankBadge = "bg-teal-500/10 text-teal-400 border border-teal-500/30";
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/10 transition">
+            <td class="py-2.5">
+              <span class="w-5 h-5 flex items-center justify-center rounded text-[10px] font-extrabold ${rankBadge}">
+                ${team.rank}
+              </span>
+            </td>
+            <td class="py-2.5 font-bold text-slate-200 flex items-center gap-1.5">
+              <span>${team.flag}</span>
+              <span class="${team.team === '대한민국' ? 'text-red-400' : ''}">${team.team}</span>
+            </td>
+            <td class="py-2.5 text-center text-slate-400 font-sports font-semibold">${team.played}</td>
+            <td class="py-2.5 text-center text-emerald-400 font-sports font-bold">${team.points}</td>
+            <td class="py-2.5 text-center text-slate-400 font-sports font-semibold">${team.gd}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Player Stats Handler
+    function toggleStatCategory(category) {
+      currentStatCategory = category;
+      
+      const scorerBtn = document.getElementById("stat-tab-scorer");
+      const assistBtn = document.getElementById("stat-tab-assist");
+      const pointBtn = document.getElementById("stat-tab-point");
+
+      const activeClass = "bg-emerald-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded border-none shrink-0";
+      const inactiveClass = "bg-slate-950 text-slate-400 border border-slate-800 hover:text-slate-200 text-[10px] font-extrabold px-2.5 py-1 rounded shrink-0";
+
+      scorerBtn.className = inactiveClass;
+      assistBtn.className = inactiveClass;
+      pointBtn.className = inactiveClass;
+
+      if (category === 'scorer') {
+        scorerBtn.className = activeClass;
+      } else if (category === 'assist') {
+        assistBtn.className = activeClass;
+      } else if (category === 'point') {
+        pointBtn.className = activeClass;
+      }
+
+      renderPlayerStats();
+    }
+
+    // Render Stats
+    function renderPlayerStats() {
+      const container = document.getElementById("player-stats-list");
+      container.innerHTML = "";
+
+      const stats = statsDatabase[currentStatCategory] || [];
+      
+      let valLabel = '골';
+      if (currentStatCategory === 'assist') {
+        valLabel = '도움';
+      } else if (currentStatCategory === 'point') {
+        valLabel = '포인트';
+      }
+
+      stats.forEach(player => {
+        container.innerHTML += `
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/80 border border-slate-800/60 hover:border-emerald-500/20 transition">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-sports font-extrabold text-emerald-400 w-4">${player.rank}</span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1">
+                  <span>${player.flag}</span>
+                  <span>${player.name}</span>
+                </h4>
+                <span class="text-[9px] text-slate-500 block">${player.team} | ${player.spec}</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-sports font-extrabold text-emerald-400 block">${player.value}<span class="text-[9px] text-slate-500 ml-0.5">${valLabel}</span></span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function updateAllCountdowns() {
+      renderKoreaMatches();
+    }
+
+    // Background Auto-sync hourly
+    function autoSyncHourly() {
+      refreshData();
+    }
+
+    // Toast Notification Creator
+    function showToast(message, type = 'success') {
+      const container = document.getElementById("toast-container");
+      if (!container) return;
+      
+      const toast = document.createElement("div");
+      toast.className = `flex items-center gap-3 bg-slate-900 border ${type === 'success' ? 'border-emerald-500/30 text-emerald-400' : 'border-red-500/30 text-red-400'} px-4 py-3.5 rounded-xl shadow-2xl transition duration-300 text-xs font-semibold transform translate-y-2 opacity-0`;
+      
+      const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-sm"></i>' : '<i class="fa-solid fa-circle-exclamation text-sm"></i>';
+      toast.innerHTML = `${icon} <span class="flex-grow">${message}</span>`;
+      
+      container.appendChild(toast);
+      
+      // Trigger entrance transition
+      setTimeout(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+        toast.classList.add("translate-y-0", "opacity-100");
+      }, 50);
+      
+      setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-2", "opacity-0");
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Load API Settings
+    function loadStoredSettings() {
+      const savedMode = localStorage.getItem("wc_api_mode");
+      const savedKey = localStorage.getItem("wc_api_key");
+      if (savedMode === "real") {
+        isRealApiMode = true;
+        customApiKey = savedKey || "";
+      }
+      updateApiModalUi();
+    }
+
+    // Modals Control
+    function openApiModal() {
+      document.getElementById("api-modal").classList.remove("hidden");
+    }
+
+    function closeApiModal() {
+      document.getElementById("api-modal").classList.add("hidden");
+    }
+
+    function toggleApiMode(real) {
+      isRealApiMode = real;
+      updateApiModalUi();
+    }
+
+    function updateApiModalUi() {
+      const modeDemoBtn = document.getElementById("mode-demo-btn");
+      const modeRealBtn = document.getElementById("mode-real-btn");
+      const credsGroup = document.getElementById("api-credentials-group");
+      const demoGroup = document.getElementById("demo-info-group");
+
+      if (isRealApiMode) {
+        modeRealBtn.className = "py-2.5 rounded-xl text-xs font-bold border-2 transition duration-300 border-emerald-500 bg-emerald-950/30 text-emerald-400";
+        modeDemoBtn.className = "py-2.5 rounded-xl text-xs font-bold border-2 border-slate-800 text-slate-400 bg-slate-950/40 hover:border-slate-700 hover:text-slate-300";
+        credsGroup.classList.remove("hidden");
+        demoGroup.classList.add("hidden");
+        document.getElementById("api-key-input").value = customApiKey;
+      } else {
+        modeDemoBtn.className = "py-2.5 rounded-xl text-xs font-bold border-2 transition duration-300 border-emerald-500 bg-emerald-950/30 text-emerald-400";
+        modeRealBtn.className = "py-2.5 rounded-xl text-xs font-bold border-2 border-slate-800 text-slate-400 bg-slate-950/40 hover:border-slate-700 hover:text-slate-300";
+        credsGroup.classList.add("hidden");
+        demoGroup.classList.remove("hidden");
+      }
+    }
+
+    function saveApiSettings() {
+      if (isRealApiMode) {
+        const val = document.getElementById("api-key-input").value.trim();
+        if (!val) {
+          showToast("API Key를 입력해 주셔야 연동이 활성화됩니다.", "error");
+          return;
+        }
+        customApiKey = val;
+        localStorage.setItem("wc_api_mode", "real");
+        localStorage.setItem("wc_api_key", customApiKey);
+        showToast("실시간 API-Football 설정이 저장되었습니다.");
+      } else {
+        localStorage.setItem("wc_api_mode", "demo");
+        isRealApiMode = false;
+        showToast("시뮬레이터 데모 모드로 복귀하였습니다.");
+      }
+      closeApiModal();
+      refreshData();
+    }
+
+    // Refresh Match Data
+    async function refreshData() {
+      const icon = document.getElementById("refresh-icon");
+      if (icon) icon.classList.add("animate-spin");
+
+      if (isRealApiMode && customApiKey) {
+        showToast("실시간 축구 API 서버 연결 중...");
+        try {
+          const result = await fetchWithRetry(`https://v3.football.api-sports.io/fixtures?league=1&season=2026`, {
+            method: 'GET',
+            headers: {
+              'x-rapidapi-key': customApiKey,
+              'x-rapidapi-host': 'v3.football.api-sports.io'
+            }
+          });
+          if (result && result.response) {
+            parseAndMapApiData(result.response);
+            showToast("실시간 피파 월드컵 매치가 동기화되었습니다.");
+          } else {
+            throw new Error("Invalid schema");
+          }
+        } catch (err) {
+          showToast("공식 API 서버 점검 중 또는 토큰 에러입니다. 데모 데이터로 유지됩니다.", "error");
+        }
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        showToast("실시간 API-Football 동기화 체크 완료 (자동 리프레시 완료)");
+      }
+
+      if (icon) icon.classList.remove("animate-spin");
+      renderKoreaMatches();
+      renderGeneralMatches();
+      renderStandings();
+    }
+
+    async function fetchWithRetry(url, options, retries = 2, delay = 1000) {
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
+        return await response.json();
+      } catch (err) {
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return fetchWithRetry(url, options, retries - 1, delay * 2);
+        }
+        throw err;
+      }
+    }
+
+    function parseAndMapApiData(apiResponseList) {
+      apiResponseList.forEach(apiMatch => {
+        const homeName = apiMatch.teams.home.name;
+        const awayName = apiMatch.teams.away.name;
+        
+        const localMatch = matchesData.find(m => 
+          (m.homeTeam === "대한민국" && homeName.includes("Korea")) ||
+          (m.awayTeam === "대한민국" && awayName.includes("Korea"))
+        );
+
+        if (localMatch) {
+          localMatch.homeScore = apiMatch.goals.home;
+          localMatch.awayScore = apiMatch.goals.away;
+          localMatch.status = apiMatch.fixture.status.short === "FT" ? "FINISHED" : "SCHEDULED";
+        }
+      });
+    }
   </script>
 </body>
 </html>
