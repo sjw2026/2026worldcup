@@ -14,12 +14,12 @@
             --text-main: #e2e8f0;
             --text-muted: #64748b;
             
-            /* 20260605_233709.jpg 핵심 네온 컬러 포인트 */
+            /* 네온 컬러 포인트 */
             --neon-cyan: #38bdf8;
             --neon-mint: #10b981;
             --neon-green: #00f5d4;
             
-            /* 포지션 대시보드용 포인트 라인 */
+            /* 포지션별 포인트 컬러 */
             --gk-glow: #ef4444;
             --df-glow: #10b981;
             --mf-glow: #3b82f6;
@@ -29,7 +29,7 @@
         body {
             font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-main);
-            /* 테크니컬 그리드 배경 패턴 구현 */
+            /* 테크니컬 그리드 배경 패턴 */
             background-image: linear-gradient(rgba(30, 41, 59, 0.15) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(30, 41, 59, 0.15) 1px, transparent 1px);
             background-size: 24px 24px;
@@ -71,40 +71,6 @@
             background-color: var(--neon-mint);
             border-radius: 50%;
             display: inline-block;
-        }
-
-        /* 메인 대시보드 헤더 스타일 */
-        header {
-            margin-bottom: 35px;
-            position: relative;
-        }
-
-        .sub-tag {
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: var(--neon-mint);
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        header h1 {
-            color: var(--neon-cyan);
-            font-size: 2.8rem;
-            font-weight: 900;
-            letter-spacing: -0.05em;
-            margin: 0 0 12px 0;
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin: 0;
-            max-width: 600px;
         }
 
         /* 피파 랭킹 순 국가 선택 네비게이션 그리드 */
@@ -151,7 +117,7 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* 컨텐츠 출력 전용 보드 패널 */
+        /* 컨텐츠 출력 보드 패널 */
         .dashboard-board {
             background-color: rgba(15, 22, 38, 0.6);
             border: 1px solid var(--border-color);
@@ -170,7 +136,7 @@
             gap: 12px;
         }
 
-        /* 포지션 그룹 섹션 라인 */
+        /* 포지션 그룹 섹션 */
         .position-container {
             margin-bottom: 40px;
         }
@@ -193,13 +159,12 @@
             display: inline-block;
         }
 
-        /* 포지션 고유 글로우 매핑 */
         .dot-gk { background-color: var(--gk-glow); box-shadow: 0 0 8px var(--gk-glow); }
         .dot-df { background-color: var(--df-glow); box-shadow: 0 0 8px var(--df-glow); }
         .dot-mf { background-color: var(--mf-glow); box-shadow: 0 0 8px var(--mf-glow); }
         .dot-fw { background-color: var(--fw-glow); box-shadow: 0 0 8px var(--fw-glow); }
 
-        /* 대시보드형 스쿼드 카드 레이아웃 */
+        /* 스쿼드 카드 레이아웃 */
         .squad-matrix {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -264,12 +229,6 @@
         <div>기준 정보: 2026년 월드컵 스쿼드 북</div>
         <div>제공처: FIFA 공식 본선 데이터북 기반 개편</div>
     </div>
-
-    <header>
-        <div class="sub-tag">FIFA 2026 북중미 월드컵 명단 대시보드</div>
-        <h1>KST SQUAD CENTER</h1>
-        <p>전세계 최정상 피파 랭킹 주요 국가 축구팀의 본선 출전 최종 엔트리를 대시보드 레이아웃을 통해 직관적이고 완벽하게 모니터링하세요.</p>
-    </header>
 
     <!-- 국가 전환 탭 매트릭스 패널 -->
     <div class="tabs-grid" id="tabsBox"></div>
@@ -371,7 +330,7 @@
         "SEN": {
             name: "세네갈", rank: "14위", flag: "🇸🇳",
             GK: [{n:1, p:"예반 디우프", c:"OGC 니스 (FRA)"}, {n:16, p:"에두아르 멘디", c:"알 아흘리 FC (KSA)"}, {n:23, p:"모리 디아우", c:"Le Havre AC (FRA)"}],
-            DF: [{n:2, p:"마마두 사르", c:"첼시 FC (ENG)"}, {n:3, p:"칼리두 쿨리발리", c:"알 힐랄 SC (KSA)"}, {n:4, p:"압dul라예 세크", c:"마카비 하이파 (ISR)"}, {n:14, p:"이스마일 야콥스", c:"갈라타사라이 SK (TUR)"}, {n:15, p:"크레팽 디아타", c:"AS 모나코 (FRA)"}, {n:19, p:"무사 니아카테", c:"올랭피크 리옹 (FRA)"}, {n:24, p:"앙투안 멘디", c:"OGC 니스 (FRA)"}, {n:25, p:"엘 하디 디우프", c:"웨스트햄 유나이티드 (ENG)"}],
+            DF: [{n:2, p:"마마두 사르", c:"첼시 FC (ENG)"}, {n:3, p:"칼리두 쿨리발리", c:"알 힐랄 SC (KSA)"}, {n:4, p:"압둘라예 세크", c:"마카비 하이파 (ISR)"}, {n:14, p:"이스마일 야콥스", c:"갈라타사라이 SK (TUR)"}, {n:15, p:"크레팽 디아타", c:"AS 모나코 (FRA)"}, {n:19, p:"무사 니아카테", c:"올랭피크 리옹 (FRA)"}, {n:24, p:"앙투안 멘디", c:"OGC 니스 (FRA)"}, {n:25, p:"엘 하디 디우프", c:"웨스트햄 유나이티드 (ENG)"}],
             MF: [{n:5, p:"이드리사 게예", c:"에버턴 FC (ENG)"}, {n:6, p:"파테 시스", c:"Rayo Vallecano (ESP)"}, {n:8, p:"라민 카마라", c:"AS 모나코 (FRA)"}, {n:17, p:"파페 마타르 사르", c:"토트넘 (ENG)"}, {n:21, p:"하비브 디아라", c:"선덜랜드 AFC (ENG)"}, {n:22, p:"바라 은디아예", c:"바이에른 뮌헨 (GER)"}, {n:26, p:"파페 게예", c:"비야레알 CF (ESP)"}],
             FW: [{n:7, p:"아산 디아오", c:"코모 (ITA)"}, {n:9, p:"밤바 디엥", c:"FC 로리앙 (FRA)"}, {n:10, p:"사디오 마네", c:"알 나스르 FC (KSA)"}, {n:11, p:"니콜라스 잭슨", c:"바이에른 뮌헨 (GER)"}, {n:12, p:"셰리프 은디아예", c:"삼순스포르 (TUR)"}, {n:13, p:"일라만 은디아예", c:"에버턴 FC (ENG)"}, {n:18, p:"이스마일라 사르", c:"크리스탈 팰리스 (ENG)"}, {n:20, p:"이브라히마 음바예", c:"파리 생제르맹 (FRA)"}]
         },
