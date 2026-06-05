@@ -136,27 +136,39 @@
         </p>
       </div>
 
-      <!-- Opening Countdown Widget -->
-      <div class="flex items-center gap-2 bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-2xl w-full md:w-auto max-w-sm">
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 block sm:hidden md:block">개막<br>남음</div>
-        <div class="grid grid-cols-4 gap-1.5 w-full">
-          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
-            <span id="cd-day" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
-            <span class="text-[9px] text-slate-500 uppercase font-semibold">Days</span>
-          </div>
-          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
-            <span id="cd-hour" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
-            <span class="text-[9px] text-slate-500 uppercase font-semibold">Hrs</span>
-          </div>
-          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
-            <span id="cd-min" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
-            <span class="text-[9px] text-slate-500 uppercase font-semibold">Mins</span>
-          </div>
-          <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[60px]">
-            <span id="cd-sec" class="block text-xl md:text-2xl font-sports font-bold text-emerald-400">00</span>
-            <span class="text-[9px] text-slate-500 uppercase font-semibold">Secs</span>
+      <!-- Countdown Widget & Squad Link Container -->
+      <div class="flex flex-col sm:flex-row items-stretch gap-3 w-full md:w-auto">
+        <!-- Opening Countdown Widget -->
+        <div class="flex items-center gap-2 bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-2xl w-full sm:w-auto max-w-sm">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 block sm:hidden md:block">개막<br>남음</div>
+          <div class="grid grid-cols-4 gap-1.5 w-full">
+            <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[55px]">
+              <span id="cd-day" class="block text-lg md:text-xl font-sports font-bold text-emerald-400">00</span>
+              <span class="text-[9px] text-slate-500 uppercase font-semibold">Days</span>
+            </div>
+            <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[55px]">
+              <span id="cd-hour" class="block text-lg md:text-xl font-sports font-bold text-emerald-400">00</span>
+              <span class="text-[9px] text-slate-500 uppercase font-semibold">Hrs</span>
+            </div>
+            <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[55px]">
+              <span id="cd-min" class="block text-lg md:text-xl font-sports font-bold text-emerald-400">00</span>
+              <span class="text-[9px] text-slate-500 uppercase font-semibold">Mins</span>
+            </div>
+            <div class="bg-cyber-black border border-slate-800 p-2 rounded text-center min-w-[55px]">
+              <span id="cd-sec" class="block text-lg md:text-xl font-sports font-bold text-emerald-400">00</span>
+              <span class="text-[9px] text-slate-500 uppercase font-semibold">Secs</span>
+            </div>
           </div>
         </div>
+
+        <!-- NEW: Squad List Page Link Button -->
+        <a href="player.html" class="flex flex-col justify-center items-center gap-1 bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold px-4 py-3 rounded-xl shadow-lg shadow-emerald-500/20 border border-emerald-400/30 transition-all duration-300 hover:scale-[1.02] text-center min-w-[120px]">
+          <span class="text-xs tracking-wider font-extrabold uppercase flex items-center gap-1.5">
+            <i class="fa-solid fa-users-viewfinder text-sm animate-bounce"></i>
+            명단 전체보기
+          </span>
+          <span class="text-[9px] text-emerald-100 font-semibold">출전국 발탁선수단 →</span>
+        </a>
       </div>
     </div>
   </header>
