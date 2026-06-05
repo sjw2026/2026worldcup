@@ -3,1503 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 FIFA 월드컵 국가별 선수단 대시보드</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF.js CDN (수동 재파싱 백업용) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- Google Fonts (Inter & Noto Sans KR) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>2026 월드컵 출전국 명단 (FIFA 랭킹순)</title>
     <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #334155;
+            --text-muted: #64748b;
+            --gk: #e11d48;
+            --df: #16a34a;
+            --mf: #ea580c;
+            --fw: #d97706;
+        }
+
         body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
         }
-        /* 우수한 드래그 앤 드롭 효과용 애니메이션 */
-        @keyframes pulse-border {
-            0%, 100% { border-color: rgba(16, 185, 129, 0.4); }
-            50% { border-color: rgba(16, 185, 129, 1); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .drag-active {
-            animation: pulse-border 1.5s infinite;
-            background-color: rgba(6, 78, 59, 0.3) !important;
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
         }
-        /* 가독성 높은 스크롤바 커스텀 */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 8px;
         }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
+
+        header p {
+            color: var(--text-muted);
+            margin: 0;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #059669;
-            border-radius: 9999px;
+
+        /* 피파 랭킹 네비게이션 탭 */
+        .tabs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #edd8d8;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            background-color: #f1f5f9;
+            border: 1px solid var(--border);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #10b981;
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        /* 국가 메인 타이틀 */
+        .country-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        /* 포지션 섹션 */
+        .position-group {
+            margin-bottom: 30px;
+        }
+
+        .position-title {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .badge-gk { background-color: var(--gk); }
+        .badge-df { background-color: var(--df); }
+        .badge-mf { background-color: var(--mf); }
+        .badge-fw { background-color: var(--fw); }
+
+        /* 선수 카드 그리드 */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .player-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .player-num {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .player-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .player-club {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white">
+<body>
 
-    <!-- 토스트 알림 컨테이너 -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-md"></div>
+<div class="container">
+    <header>
+        <h1>🏆 2026 월드컵 본선 스쿼드 데이터 조회기</h1>
+        <p>FIFA 랭킹 1위~17위 진출국 라인업 (포지션별 순차 정렬)</p>
+    </header>
 
-    <!-- 메인 래퍼 레이아웃 -->
-    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        
-        <!-- 대시보드 메인 헤더 -->
-        <header class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 mb-8 gap-4">
-            <div class="flex items-center gap-4">
-                <div class="p-3 bg-emerald-600/20 text-emerald-400 rounded-2xl border border-emerald-500/30 shadow-lg shadow-emerald-500/10">
-                    <!-- 역동적인 회전 구 형태의 축구공 SVG 아이콘 -->
-                    <svg class="w-8 h-8 animate-[spin_8s_linear_infinite]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M12 2v20M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-200 to-emerald-500 bg-clip-text text-transparent">
-                        2026 FIFA World Cup™
-                    </h1>
-                    <p class="text-xs sm:text-sm text-slate-400 mt-1">48개국 전체 참가팀 공식 스쿼드 정보관 (실시간 한글 매핑 완료)</p>
-                </div>
-            </div>
+    <!-- 국가 이동용 탭 컨테이너 -->
+    <div class="tabs-container" id="tabsBox"></div>
 
-            <!-- 데이터 소스 전환 및 안내 배너 -->
-            <div class="flex items-center gap-3">
-                <span id="data-status-badge" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    실시간 한글 데이터베이스 구동 중
-                </span>
-                <!-- 수동 데이터 동기화 기능 백업용 파일 필드 -->
-                <button onclick="document.getElementById('pdf-file-input').click()" class="px-4 py-2 text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl transition-all flex items-center gap-2 border border-slate-800">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
-                    PDF로 재동기화
-                </button>
-                <input type="file" id="pdf-file-input" class="hidden" accept=".pdf" />
-            </div>
-        </header>
+    <!-- 데이터 출력 본문 -->
+    <main>
+        <div class="country-header" id="countryTitle"></div>
+        <div id="squadDisplay"></div>
+    </main>
+</div>
 
-        <!-- 총괄 종합 통계 브리핑 대시보드 -->
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-slate-900/30 border border-slate-900 p-5 rounded-2xl flex flex-col justify-between">
-                <p class="text-xs text-slate-400 font-medium">분석 데이터베이스</p>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-100 mt-2">48개국 전체 완료</h3>
-            </div>
-            <div class="bg-slate-900/30 border border-slate-900 p-5 rounded-2xl flex flex-col justify-between">
-                <p class="text-xs text-slate-400 font-medium">인코딩된 한글 명단</p>
-                <h3 id="stat-players" class="text-xl sm:text-2xl font-extrabold text-emerald-400 mt-2">362명 수록</h3>
-            </div>
-            <div class="bg-slate-900/30 border border-slate-900 p-5 rounded-2xl flex flex-col justify-between">
-                <p class="text-xs text-slate-400 font-medium">전체 선수 평균 신장</p>
-                <h3 id="stat-avg-height" class="text-xl sm:text-2xl font-extrabold text-teal-400 mt-2">181.7 cm</h3>
-            </div>
-            <div class="bg-slate-900/30 border border-slate-900 p-5 rounded-2xl flex flex-col justify-between">
-                <p class="text-xs text-slate-400 font-medium">실시간 검색 필터 상태</p>
-                <h3 id="stat-source" class="text-xs font-semibold text-emerald-400 mt-3 truncate bg-emerald-500/5 px-2.5 py-1 rounded-lg border border-emerald-500/10 text-center">
-                    별도 다운로드/업로드 필요없음
-                </h3>
-            </div>
-        </section>
+<script>
+    // 16개 월드컵 진출국의 전체 한글 데이터베이스 정의
+    const worldCupSquads = {
+        "FRA": {
+            name: "프랑스", rank: "1위", flag: "🇫🇷",
+            GK: [{n:1, p:"브리스 삼바", c:"스타드 렌 (FRA)"}, {n:16, p:"마이크 메냥", c:"AC 밀란 (ITA)"}, {n:23, p:"로빈 리셔", club:"RC 렌스 (FRA)"}],
+            DF: [{n:2, p:"말로 구스토", c:"첼시 (ENG)"}, {n:3, p:"뤼카 디뉴", c:"아스톤 빌라 (ENG)"}, {n:4, p:"다요 우파메카노", c:"바이에른 뮌헨 (GER)"}, {n:5, p:"쥘 쿤데", c:"FC 바르셀로나 (ESP)"}, {n:15, p:"이브라히마 코나테", c:"리버풀 (ENG)"}, {n:17, p:"윌리엄 살리바", c:"아스널 (ENG)"}, {n:19, p:"테오 에르난데스", c:"알 힐랄 (KSA)"}, {n:21, p:"뤼카 에르난데스", c:"파리 생제르맹 (FRA)"}, {n:26, p:"막상스 라크루아", c:"크리스탈 팰리스 (ENG)"}],
+            MF: [{n:6, p:"마누 코네", c:"AS 로마 (ITA)"}, {n:8, p:"오렐리앵 추아메니", c:"레알 마드리드 (ESP)"}, {n:13, p:"은골로 캉테", c:"페네르바체 (TUR)"}, {n:14, p:"아드리앵 라비오", c:"AC 밀란 (ITA)"}, {n:18, p:"워렌 자이르-에메리", c:"파리 생제르맹 (FRA)"}, {n:24, p:"라얀 셰르키", c:"맨체스터 시티 (ENG)"}, {n:25, p:"마그네스 아클리우슈", c:"AS 모나코 (FRA)"}],
+            FW: [{n:7, p:"우스만 뎀벨레", c:"파리 생제르맹 (FRA)"}, {n:9, p:"마르쿠스 튀람", c:"인테르나치오날레 (ITA)"}, {n:10, p:"킬리안 음바페", c:"레알 마드리드 (ESP)"}, {n:11, p:"마이클 올리세", c:"바이에른 뮌헨 (GER)"}, {n:12, p:"브래들리 바르콜라", c:"파리 생제르맹 (FRA)"}, {n:20, p:"데지레 두에", c:"파리 생제르맹 (FRA)"}, {n:22, p:"장필리프 마테타", c:"크리스탈 팰리스 (ENG)"}]
+        },
+        "ESP": {
+            name: "스페인", rank: "2위", flag: "🇪🇸",
+            GK: [{n:1, p:"다비드 라야", c:"아스널 (ENG)"}, {n:13, p:"조안 가르시아", c:"FC 바르셀로나 (ESP)"}, {n:23, p:"우나이 시몬", c:"아틀레틱 클루브 (ESP)"}],
+            DF: [{n:2, p:"마르크 푸빌", c:"아틀레티코 마드리드 (ESP)"}, {n:3, p:"알렉스 그리말도", c:"바이어 레버쿠젠 (GER)"}, {n:4, p:"에릭 가르시아", c:"FC 바르셀로나 (ESP)"}, {n:5, p:"마르코스 요렌테", c:"아틀레티코 마드리드 (ESP)"}, {n:12, p:"페드로 포로", c:"토트넘 홋스퍼 (ENG)"}, {n:14, p:"아이메릭 라포르트", c:"아틀레틱 클루브 (ESP)"}, {n:22, p:"파우 쿠바르시", c:"FC 바르셀로나 (ESP)"}, {n:24, p:"마르크 쿠쿠렐랴", c:"첼시 (ENG)"}],
+            MF: [{n:6, p:"미켈 메리노", c:"아스널 (ENG)"}, {n:8, p:"파비안 루이스", c:"파리 생제르맹 (FRA)"}, {n:9, p:"가비", c:"FC 바르셀로나 (ESP)"}, {n:15, p:"알렉스 바에나", c:"아틀레티코 마드리드 (ESP)"}, {n:16, p:"로드리", c:"맨체스터 시티 (ENG)"}, {n:18, p:"마르틴 수비멘디", c:"아스널 (ENG)"}, {n:20, p:"페드리", c:"FC 바르셀로나 (ESP)"}],
+            FW: [{n:7, p:"페란 토레스", c:"FC 바르셀로나 (ESP)"}, {n:10, p:"다니 올모", c:"FC 바르셀로나 (ESP)"}, {n:11, p:"예레미 피노", c:"크리스탈 팰리스 (ENG)"}, {n:17, p:"니코 윌리엄스", c:"아틀레틱 클루브 (ESP)"}, {n:19, p:"라민 야말", c:"FC 바르셀로나 (ESP)"}, {n:21, p:"미켈 오야르사발", c:"레알 소시에다드 (ESP)"}, {n:25, p:"빅토르 무뇨스", c:"CA 오사수나 (ESP)"}, {n:26, p:"보르하 이글레시아스", c:"RC Celta Vigo (ESP)"}]
+        },
+        "ARG": {
+            name: "아르헨티나", rank: "3위", flag: "🇦🇷",
+            GK: [{n:1, p:"후안 무소", c:"아틀레티코 마드리드 (ESP)"}, {n:12, p:"헤로니모 룰리", c:"마르세유 (FRA)"}, {n:23, p:"에밀리아노 마르티네스", c:"아스톤 빌라 (ENG)"}],
+            DF: [{n:2, p:"레오나르도 발레르디", c:"마르세유 (FRA)"}, {n:3, p:"니콜라스 탈리아피코", c:"올랭피크 리옹 (FRA)"}, {n:4, p:"곤살로 몬티엘", c:"리버 플레이트 (ARG)"}, {n:6, p:"리산드로 마르티네스", c:"맨체스터 유나이티드 (ENG)"}, {n:13, p:"크리스티안 로메로", c:"토트넘 (ENG)"}, {n:19, p:"니콜라스 오타멘디", c:"SL 벤피카 (POR)"}, {n:25, p:"파쿤도 메디나", c:"마르세유 (FRA)"}, {n:26, p:"나우엘 몰리나", c:"아틀레티코 마드리드 (ESP)"}],
+            MF: [{n:5, p:"레안드로 파레데스", c:"보카 주니어스 (ARG)"}, {n:7, p:"로드리고 데 파울", c:"인터 마이애미 (USA)"}, {n:8, p:"발렌틴 바르코", c:"RC 스트라스부르 (FRA)"}, {n:11, p:"지오바니 로 셀소", c:"레알 베티스 (ESP)"}, {n:14, p:"에세키엘 팔라시오스", c:"바이어 레버쿠젠 (GER)"}, {n:15, p:"니코 곤살레스", c:"아틀레티코 마드리드 (ESP)"}, {n:20, p:"알렉시스 맥 앨리스터", c:"리버풀 (ENG)"}, {n:24, p:"엔소 페르난데스", c:"첼시 (ENG)"}],
+            FW: [{n:9, p:"훌리안 알바레스", c:"아틀레티코 마드리드 (ESP)"}, {n:10, p:"리오넬 메시", c:"인터 마이애미 (USA)"}, {n:16, p:"티아고 알마다", c:"아틀레티코 마드리드 (ESP)"}, {n:17, p:"줄리아노 시메오네", c:"아틀레티코 마드리드 (ESP)"}, {n:18, p:"니코 파스", c:"코모 (ITA)"}, {n:21, p:"호세 마누엘 로페스", c:"파우메이라스 (BRA)"}, {n:22, p:"라우타로 마르티네스", c:"인테르나치오날레 (ITA)"}]
+        },
+        "ENG": {
+            name: "잉글랜드", rank: "4위", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+            GK: [{n:1, p:"조던 픽포드", c:"에버턴 (ENG)"}, {n:13, p:"딘 헨더슨", c:"크리스탈 팰리스 (ENG)"}, {n:23, p:"제임스 트래포드", c:"맨체스터 시티 (ENG)"}],
+            DF: [{n:2, p:"에즈리 콘사", c:"아스톤 빌라 (ENG)"}, {n:3, p:"니코 오라일리", c:"맨체스터 시티 (ENG)"}, {n:5, p:"존 스톤스", c:"맨체스터 시티 (ENG)"}, {n:6, p:"마크 게히", c:"맨체스터 시티 (ENG)"}, {n:12, p:"티노 리브라멘토", c:"뉴캐슬 (ENG)"}, {n:15, p:"댄 번", c:"뉴캐슬 (ENG)"}, {n:24, p:"리스 제임스", c:"첼시 (ENG)"}, {n:25, p:"제드 스펜스", c:"토트넘 홋스퍼 (ENG)"}, {n:26, p:"자렐 콴사", c:"바이어 레버쿠젠 (GER)"}],
+            MF: [{n:4, p:"데클란 라이스", c:"아스널 (ENG)"}, {n:8, p:"엘리엇 앤더슨", c:"노팅엄 포레스트 (ENG)"}, {n:10, p:"주드 벨링햄", c:"레알 마드리드 (ESP)"}, {n:14, p:"조던 헨더슨", c:"브렌트포드 (ENG)"}, {n:16, p:"코비 마이누", c:"맨체스터 유나이티드 (ENG)"}, {n:17, p:"모건 로저스", c:"아스톤 빌라 (ENG)"}, {n:21, p:"에베레치 에제", c:"아스널 (ENG)"}],
+            FW: [{n:7, p:"부카요 사카", c:"아스널 (ENG)"}, {n:9, p:"해리 케인", c:"바이에른 뮌헨 (GER)"}, {n:11, p:"마커스 래시포드", c:"FC 바르셀로나 (ESP)"}, {n:18, p:"앤서니 고든", c:"뉴캐슬 (ENG)"}, {n:19, p:"올리 왓킨스", c:"아스톤 빌라 (ENG)"}, {n:20, p:"노니 마두에케", c:"아스널 (ENG)"}, {n:22, p:"아이반 토니", c:"알 아흘리 (KSA)"}]
+        },
+        "POR": {
+            name: "포르투갈", rank: "5위", flag: "🇵🇹",
+            GK: [{n:1, p:"디오구 코스타", c:"FC 포르투 (POR)"}, {n:12, p:"조세 사", c:"울버햄튼 (ENG)"}, {n:22, p:"루이 실바", c:"스포르팅 CP (POR)"}],
+            DF: [{n:2, p:"넬송 세메두", c:"페네르바체 SK (TUR)"}, {n:3, p:"후벵 디아스", c:"맨체스터 시티 (ENG)"}, {n:4, p:"토마스 아라우조", c:"SL 벤피카 (POR)"}, {n:5, p:"디오구 달롯", c:"맨체스터 유나이티드 (ENG)"}, {n:13, p:"레나토 베이가", c:"비야레알 CF (ESP)"}, {n:14, p:"곤살루 이나시우", c:"스포르팅 CP (POR)"}, {n:20, p:"조앙 칸셀루", c:"FC 바르셀로나 (ESP)"}, {n:24, p:"사무 코스타", c:"RCD 마요르카 (ESP)"}, {n:25, p:"누누 멘데스", c:"파리 생제르맹 (FRA)"}],
+            MF: [{n:6, p:"마테우스 누네스", c:"맨체스터 시티 (ENG)"}, {n:8, p:"브루누 페르난데스", c:"맨체스터 유나이티드 (ENG)"}, {n:10, p:"베르나르두 실바", c:"맨체스터 시티 (ENG)"}, {n:15, p:"조앙 네베스", c:"파리 생제르맹 (FRA)"}, {n:21, p:"루벤 네베스", c:"알 힐랄 (KSA)"}, {n:23, p:"비티냐", c:"파리 생제르맹 (FRA)"}],
+            FW: [{n:7, p:"크리스티아누 호날두", c:"알 나스르 FC (KSA)"}, {n:9, p:"곤살루 하무스", c:"파리 생제르맹 (FRA)"}, {n:11, p:"조앙 펠릭스", c:"알 나스르 FC (KSA)"}, {n:16, p:"프란시스쿠 트린캉", c:"스포르팅 CP (POR)"}, {n:17, p:"하파엘 레앙", c:"AC 밀란 (ITA)"}, {n:18, p:"페드로 네투", c:"첼시 FC (ENG)"}, {n:19, p:"곤살루 게드스", c:"레알 소시에다드 (ESP)"}, {n:26, p:"프란시스쿠 콘세이상", c:"유벤투스 FC (ITA)"}]
+        },
+        "BRA": {
+            name: "브라질", rank: "6위", flag: "🇧🇷",
+            GK: [{n:1, p:"알리송 베커", c:"리버풀 FC (ENG)"}, {n:12, p:"웨베르통", c:"그레미우 (BRA)"}, {n:23, p:"에데르송", c:"페네르바체 SK (TUR)"}],
+            DF: [{n:2, p:"웨슬리", c:"AS 로마 (ITA)"}, {n:3, p:"가브리엘 마갈량이스", c:"아스널 FC (ENG)"}, {n:4, p:"마르퀴뉴스", c:"파리 생제르맹 (FRA)"}, {n:6, p:"알렉스 산드로", c:"CR 플라멩구 (BRA)"}, {n:13, p:"다닐루", c:"CR 플라멩구 (BRA)"}, {n:14, p:"글레이송 브레메르", c:"유벤투스 FC (ITA)"}, {n:15, p:"레오 페레이라", c:"CR 플라멩구 (BRA)"}, {n:16, p:"더글라스 산토스", c:"제니트 (RUS)"}, {n:24, p:"로저 이바녜스", c:"알 아흘리 FC (KSA)"}],
+            MF: [{n:5, p:"카세미루", c:"맨체스터 유나이티드 (ENG)"}, {n:8, p:"브루누 기마랑이스", c:"뉴캐슬 유나이티드 (ENG)"}, {n:17, p:"파비뉴", c:"알 이티하드 (KSA)"}, {n:18, p:"다닐루 산토스", c:"보타포구 (BRA)"}, {n:20, p:"루카스 파케타", c:"CR 플라멩구 (BRA)"}],
+            FW: [{n:7, p:"비니시우스 주니어", c:"레알 마드리드 (ESP)"}, {n:9, p:"마테우스 쿠냐", c:"맨체스터 유나이티드 (ENG)"}, {n:10, p:"네이마르 주니어", c:"산투스 FC (BRA)"}, {n:11, p:"하피냐", c:"FC 바르셀로나 (ESP)"}, {n:19, p:"엔드릭", c:"올랭피크 리옹 (FRA)"}, {n:21, p:"루이스 엔리케", c:"제니트 (RUS)"}, {n:22, p:"가브리엘 마르티네리", c:"아스널 FC (ENG)"}, {n:25, p:"이호르 치아구", c:"브렌트포드 FC (ENG)"}, {n:26, p:"하얀", c:"AFC 본머 (ENG)"}]
+        },
+        "NED": {
+            name: "네덜란드", rank: "7위", flag: "🇳🇱",
+            GK: [{n:1, p:"바르트 페르브뤼헌", c:"브라이튼 (ENG)"}, {n:13, p:"로빈 루프스", c:"선덜랜드 AFC (ENG)"}, {n:23, p:"마르크 플레컨", c:"바이어 레버쿠젠 (GER)"}],
+            DF: [{n:2, p:"위리엔 팀버", c:"아스널 FC (ENG)"}, {n:4, p:"버질 반 다이크", c:"리버풀 FC (ENG)"}, {n:5, p:"네이선 아케", c:"맨체스터 시티 (ENG)"}, {n:6, p:"얀 폴 반 헤케", c:"브라이튼 (ENG)"}, {n:12, p:"마츠 위퍼", c:"브라이튼 (ENG)"}, {n:15, p:"미키 판 더 펜", c:"토트넘 (ENG)"}, {n:22, p:"덴젤 둠프리스", c:"인테르나치오날레 (ITA)"}, {n:25, p:"요렐 하토", c:"첼시 FC (ENG)"}],
+            MF: [{n:3, p:"마르텐 드 룬", c:"아탈란타 (ITA)"}, {n:7, p:"저스틴 클라위베르트", c:"AFC 본머스 (ENG)"}, {n:8, p:"라이언 흐라번베르흐", c:"리버풀 FC (ENG)"}, {n:14, p:"티자니 라인데르스", c:"맨체스터 시티 (ENG)"}, {n:16, p:"구스 틸", c:"PSV 에인트호번 (NED)"}, {n:20, p:"퇸 코프메이너르스", c:"유벤투스 FC (ITA)"}, {n:21, p:"프렌키 더 용", c:"FC 바르셀로나 (ESP)"}, {n:26, p:"큉텐 팀버", c:"마르세유 (FRA)"}],
+            FW: [{n:9, p:"보우트 베호르스트", c:"AFC 아약스 (NED)"}, {n:10, p:"멤피스 데파이", c:"SC 코린치안스 (BRA)"}, {n:11, p:"코디 각포", c:"리버풀 FC (ENG)"}, {n:17, p:"노아 랑", c:"갈라타사라이 SK (TUR)"}, {n:18, p:"도니얼 말런", c:"AS 로마 (ITA)"}, {n:19, p:"브라이언 브로비", c:"선덜랜드 AFC (ENG)"}, {n:24, p:"크리센시오 서머빌", c:"웨스트햄 유나이티드 (ENG)"}]
+        },
+        "MAR": {
+            name: "모로코", rank: "8위", flag: "🇲🇦",
+            GK: [{n:1, p:"야신 부누", c:"알 힐랄 SC (KSA)"}, {n:12, p:"무니르 엘 카주이", c:"RS 베르칸 (MAR)"}, {n:22, p:"아흐메드 타그나우티", c:"ASFAR (MAR)"}],
+            DF: [{n:2, p:"아슈라프 하키미", c:"파리 생제르맹 (FRA)"}, {n:3, p:"누사이르 마즈라위", c:"맨체스터 유나이티드 (ENG)"}, {n:5, p:"나예프 아구에르드", c:"마르세유 (FRA)"}, {n:13, p:"자카리아 엘 우아디", c:"KRC 헹크 (BEL)"}, {n:14, p:"이사에 디오프", c:"풀럼 FC (ENG)"}, {n:18, p:"샤디 리아드", c:"크리스탈 팰리스 (ENG)"}, {n:19, p:"유세프 벨라 마리", c:"알 아흘리 FC (EGY)"}, {n:25, p:"레두안 할할", c:"KV 메헬렌 (BEL)"}, {n:26, p:"아나스 살라 에딘", c:"PSV 에인트호번 (NED)"}],
+            MF: [{n:4, p:"소피앙 암라바트", c:"레알 베티스 (ESP)"}, {n:6, p:"아유브 부아디", c:"릴 OSC (FRA)"}, {n:7, p:"솀스딘 탈비", c:"선덜랜드 AFC (ENG)"}, {n:8, p:"아제딘 우나히", c:"지로나 FC (ESP)"}, {n:11, p:"이스마엘 사이바리", c:"PSV 에인트호번 (NED)"}, {n:15, p:"사미르 엘 무라베트", c:"스트라스부르 (FRA)"}, {n:16, p:"게심 야신", c:"스트라스부르 (FRA)"}, {n:23, p:"비랄 엘 칸누스", c:"VfB 슈투트가르트 (GER)"}, {n:24, p:"네일 엘 아이나우이", c:"AS 로마 (ITA)"}],
+            FW: [{n:9, p:"수피안 라히미", c:"알 인 FC (UAE)"}, {n:10, p:"브라힘 디아스", c:"레알 마드리드 (ESP)"}, {n:17, p:"압데 에잘줄리", c:"레알 베티스 (ESP)"}, {n:20, p:"아유브 엘 카아비", c:"올림피아코스 FC (GRE)"}, {n:21, p:"아유브 아마이무니", c:"프랑크푸르트 (GER)"}]
+        },
+        "BEL": {
+            name: "벨기에", rank: "9위", flag: "🇧🇪",
+            GK: [{n:1, p:"티보 쿠르투아", c:"레알 마드리드 (ESP)"}, {n:12, p:"센 람멘스", c:"맨체스터 유나이티드 (ENG)"}, {n:13, p:"마이크 펜더스", c:"스트라스부르 (FRA)"}],
+            DF: [{n:2, p:"제노 데바스트", c:"스포르팅 CP (POR)"}, {n:3, p:"아르튀르 테아트", c:"프랑크푸르트 (GER)"}, {n:4, p:"브랜던 메쉘레", c:"클럽 브뤼허 (BEL)"}, {n:5, p:"막심 드 카이퍼", c:"브라이튼 (ENG)"}, {n:15, p:"토마 뫼니에", c:"릴 OSC (FRA)"}, {n:16, p:"코니 드 빈터", c:"AC 밀란 (ITA)"}, {n:18, p:"조아킹 세이스", c:"클럽 브뤼허 (BEL)"}, {n:21, p:"티모시 카스타뉴", c:"풀럼 FC (ENG)"}, {n:25, p:"나단 응고이", c:"릴 OSC (FRA)"}],
+            MF: [{n:6, p:"아셀 비첼", c:"지로나 FC (ESP)"}, {n:7, p:"케빈 더 브라위너", c:"SSC 나폴리 (ITA)"}, {n:8, p:"유리 틸레만스", c:"아스톤 빌라 (ENG)"}, {n:19, p:"디에구 모레이라", c:"스트라스부르 (FRA)"}, {n:20, p:"한스 바나켄", c:"클럽 브뤼허 (BEL)"}, {n:22, p:"알렉시스 살레마커스", c:"AC 밀란 (ITA)"}, {n:23, p:"니콜라스 라스킨", c:"레인저스 FC (SCO)"}, {n:24, p:"아마두 오나나", c:"아스톤 빌라 (ENG)"}],
+            FW: [{n:9, p:"로멜루 루카쿠", c:"SSC 나폴리 (ITA)"}, {n:10, p:"레안드로 트로사르", c:"아스널 FC (ENG)"}, {n:11, p:"제레미 도쿠", c:"맨체스터 시티 (ENG)"}, {n:14, p:"도디 루케바키오", c:"SL 벤피카 (POR)"}, {n:17, p:"샤를 드 케텔라에르", c:"아탈란타 (ITA)"}, {n:26, p:"마티아스 파르도", c:"릴 OSC (FRA)"}]
+        },
+        "GER": {
+            name: "독일", rank: "10위", flag: "🇩🇪",
+            GK: [{n:1, p:"마누엘 노이어", c:"바이에른 뮌헨 (GER)"}, {n:12, p:"올리버 바우만", c:"TSG 호펜하임 (GER)"}, {n:21, p:"알렉산더 뉘벨", c:"VfB 슈투트가르트 (GER)"}],
+            DF: [{n:2, p:"안토니오 뤼디거", c:"레알 마드리드 (ESP)"}, {n:3, p:"발데마르 안톤", c:"보루시아 도르트문트 (GER)"}, {n:4, p:"조나단 타", c:"바이에른 뮌헨 (GER)"}, {n:6, p:"요주아 키미히", c:"바이에른 뮌헨 (GER)"}, {n:15, p:"니코 슐로터베크", c:"보루시아 도르트문트 (GER)"}, {n:18, p:"나다니엘 브라운", c:"프랑크푸르트 (GER)"}, {n:22, p:"다비트 라움", c:"RB 라이프치히 (GER)"}, {n:24, p:"말릭 치아우", c:"뉴캐슬 (ENG)"}],
+            MF: [{n:5, p:"알렉산다르 파블로비치", c:"바이에른 뮌헨 (GER)"}, {n:8, p:"레온 고레츠카", c:"바이에른 뮌헨 (GER)"}, {n:9, p:"제이미 레벨링", c:"VfB 슈투트가르트 (GER)"}, {n:10, p:"자말 무시알라", c:"바이에른 뮌헨 (GER)"}, {n:13, p:"파스칼 그로스", c:"브라이튼 (ENG)"}, {n:16, p:"안젤로 스틸러", c:"VfB 슈투트가르트 (GER)"}, {n:17, p:"플로리안 비르츠", c:"리버풀 FC (ENG)"}, {n:20, p:"나딤 아미리", c:"1. FSV 마인츠 05 (GER)"}, {n:23, p:"펠릭스 은메차", c:"보루시아 도르트문트 (GER)"}, {n:25, p:"레나르트 칼", c:"바이에른 뮌헨 (GER)"}],
+            FW: [{n:7, p:"카이 하베르츠", c:"아스널 FC (ENG)"}, {n:11, p:"닉 볼테마데", c:"뉴캐슬 (ENG)"}, {n:14, p:"막시밀리안 바이어", c:"보루시아 도르트문트 (GER)"}, {n:26, p:"데니즈 운다브", c:"VfB 슈투트가르트 (GER)"}]
+        },
+        "CRO": {
+            name: "크로아티아", rank: "11위", flag: "🇭🇷",
+            GK: [{n:1, p:"도미니크 리바코비치", c:"디나모 자그레브 (CRO)"}, {n:12, p:"이보 판두르", c:"헐 시티 FC (ENG)"}, {n:23, p:"도미니크 코타르스키", c:"FC 코펜하겐 (DEN)"}],
+            DF: [{n:2, p:"요시프 스타니시치", c:"바이에른 뮌헨 (GER)"}, {n:3, p:"마린 퐁그라치치", c:"ACF 피오렌티나 (ITA)"}, {n:4, p:"요슈코 그바르디올", c:"맨체스터 시티 (ENG)"}, {n:5, p:"두예 찰레타-차르", c:"레알 소시에다드 (ESP)"}, {n:6, p:"요시프 슈탈로", c:"AFC 아약스 (NED)"}, {n:18, p:"크리스티얀 야키치", c:"FC 아우크스부르크 (GER)"}, {n:22, p:"루카 부스코비치", c:"함부르크 SV (GER)"}, {n:25, p:"마르틴 에를리치", c:"FC 미트윌란 (DEN)"}],
+            MF: [{n:7, p:"니콜라 모로", c:"볼로냐 FC (ITA)"}, {n:8, p:"마테오 코바치치", c:"맨체스터 시티 (ENG)"}, {n:10, p:"루카 모드리치", c:"AC 밀란 (ITA)"}, {n:13, p:"니콜라 블라시치", c:"토리노 FC (ITA)"}, {n:15, p:"마리오 파샬리치", c:"아탈란타 (ITA)"}, {n:16, p:"마르틴 바투리나", c:"코모 (ITA)"}, {n:17, p:"페타르 수치치", c:"인테르나치오날레 (ITA)"}, {n:19, p:"토니 프루크", c:"HNK 리예카 (CRO)"}, {n:21, p:"루카 수치치", c:"레알 소시에다드 (ESP)"}],
+            FW: [{n:9, p:"안드레이 크라마리치", c:"TSG 호펜하임 (GER)"}, {n:11, p:"안테 부디미르", c:"CA 오사수나 (ESP)"}, {n:14, p:"이반 페리시치", c:"PSV 에인트호번 (NED)"}, {n:20, p:"이고르 마타노비치", c:"SC 프라이부르크 (GER)"}, {n:24, p:"마르코 파샬리치", c:"올랜도 시티 SC (USA)"}, {n:26, p:"페타르 무사", c:"FC 달라스 (USA)"}]
+        },
+        "COL": {
+            name: "콜롬비아", rank: "13위", flag: "🇨🇴",
+            GK: [{n:1, p:"다비드 오스피나", c:"아틀레티코 나시오날 (COL)"}, {n:12, p:"카밀로 바르가스", c:"아틀라스 FC (MEX)"}, {n:24, p:"알바로 몬테로", c:"벨레스 사르스필드 (ARG)"}],
+            DF: [{n:2, p:"다니엘 무뇨스", c:"크리스탈 팰리스 (ENG)"}, {n:3, p:"존 루쿠미", c:"볼로냐 FC (ITA)"}, {n:4, p:"산티아고 아리아스", c:"CA 인디펜디엔테 (ARG)"}, {n:13, p:"예리 미나", c:"칼리아리 (ITA)"}, {n:14, p:"구스타보 푸에르타", c:"라싱 산탄데르 (ESP)"}, {n:17, p:"요한 모히카", c:"RCD 마요르카 (ESP)"}, {n:18, p:"윌레르 디타", c:"CF 크루스 아술 (MEX)"}, {n:22, p:"데이베르 마차도", c:"FC 낭트 (FRA)"}, {n:23, p:"다빈손 산체스", c:"갈라타사라이 SK (TUR)"}],
+            MF: [{n:5, p:"케빈 카스타뇨", c:"리버 플레이트 (ARG)"}, {n:6, p:"리차르드 리오스", c:"SL 벤피카 (POR)"}, {n:8, p:"호르헤 카라스칼", c:"CR 플라멩구 (BRA)"}, {n:10, p:"하메스 로드리게스", c:"미네소타 유나이티드 (USA)"}, {n:11, p:"존 아리아스", c:"SE 파우메이라스 (BRA)"}, {n:15, p:"후안 포르티야", c:"아틀레치쿠 파라나엔시 (BRA)"}, {n:16, p:"제페르손 레르마", c:"크리스탈 팰리스 (ENG)"}, {n:20, p:"후안 킨테로", c:"리버 플레이트 (ARG)"}],
+            FW: [{n:7, p:"루이스 디아스", c:"바이에른 뮌헨 (GER)"}, {n:9, p:"존 코르도바", c:"FC 크라스노다르 (RUS)"}, {n:19, p:"쿠초 에르난데스", c:"레알 베티스 (ESP)"}, {n:21, p:"하민톤 캄파스", c:"로사리오 센트랄 (ARG)"}, {n:25, p:"루이스 수아레스", c:"스포르팅 CP (POR)"}, {n:26, p:"안드레스 고메스", c:"크루제이루 (BRA)"}]
+        },
+        "SEN": {
+            name: "세네갈", rank: "14위", flag: "🇸🇳",
+            GK: [{n:1, p:"예반 디우프", c:"OGC 니스 (FRA)"}, {n:16, p:"에두아르 멘디", c:"알 아흘리 FC (KSA)"}, {n:23, p:"모리 디아우", c:"Le Havre AC (FRA)"}],
+            DF: [{n:2, p:"마마두 사르", c:"첼시 FC (ENG)"}, {n:3, p:"칼리두 쿨리발리", c:"알 힐랄 SC (KSA)"}, {n:4, p:"압둘라예 세크", c:"마카비 하이파 (ISR)"}, {n:14, p:"이스마일 야콥스", c:"갈라타사라이 SK (TUR)"}, {n:15, p:"크레팽 디아타", c:"AS 모나코 (FRA)"}, {n:19, p:"무사 니아카테", c:"올랭피크 리옹 (FRA)"}, {n:24, p:"앙투안 멘디", c:"OGC 니스 (FRA)"}, {n:25, p:"엘 하디 디우프", c:"웨스트햄 유나이티드 (ENG)"}],
+            MF: [{n:5, p:"이드리사 게예", c:"에버턴 FC (ENG)"}, {n:6, p:"파테 시스", c:"Rayo Vallecano (ESP)"}, {n:8, p:"라민 카마라", c:"AS 모나코 (FRA)"}, {n:17, p:"파페 마타르 사르", c:"토트넘 (ENG)"}, {n:21, p:"하비브 디아라", c:"선덜랜드 AFC (ENG)"}, {n:22, p:"바라 은디아예", c:"바이에른 뮌헨 (GER)"}, {n:26, p:"파페 게예", c:"비야레알 CF (ESP)"}],
+            FW: [{n:7, p:"아산 디아오", c:"코모 (ITA)"}, {n:9, p:"밤바 디엥", c:"FC 로리앙 (FRA)"}, {n:10, p:"사디오 마네", c:"알 나스르 FC (KSA)"}, {n:11, p:"니콜라스 잭슨", c:"바이에른 뮌헨 (GER)"}, {n:12, p:"셰리프 은디아예", c:"삼순스포르 (TUR)"}, {n:13, p:"일라만 은디아예", c:"에버턴 FC (ENG)"}, {n:18, p:"이스마일라 사르", c:"크리스탈 팰리스 (ENG)"}, {n:20, p:"이브라히마 음바예", c:"파리 생제르맹 (FRA)"}]
+        },
+        "MEX": {
+            name: "멕시코", rank: "15위", flag: "🇲🇽",
+            GK: [{n:1, p:"라울 란헬", c:"CD 과달라하라 (MEX)"}, {n:12, p:"카를로스 아세베도", c:"산토스 라구나 (MEX)"}, {n:13, p:"기예르모 오초아", c:"AEL 리마솔 (CYP)"}],
+            DF: [{n:2, p:"호르헤 산체스", c:"PAOK (GRE)"}, {n:3, p:"세사르 몬테스", c:"로코모티프 모스크바 (RUS)"}, {n:4, p:"에드손 알바레스", c:"페네르바체 SK (TUR)"}, {n:5, p:"요한 바스케스", c:"제노아 CFC (ITA)"}, {n:15, p:"이스라엘 레예스", c:"클럽 아메리카 (MEX)"}, {n:20, p:"마테오 차베스", c:"AZ 알크마르 (NED)"}, {n:23, p:"헤수스 가야르도", c:"톨루카 FC (MEX)"}],
+            MF: [{n:6, p:"에릭 리라", c:"CF 크루스 아술 (MEX)"}, {n:7, p:"루이스 로모", c:"CD 과달라하라 (MEX)"}, {n:8, p:"알바로 피달고", c:"레알 베티스 (ESP)"}, {n:17, p:"오르벨린 피네다", c:"AEK 아테네 (GRE)"}, {n:18, p:"오베드 바르가스", c:"아틀레티코 마드리드 (ESP)"}, {n:19, p:"힐베르토 모라", c:"클럽 티후아나 (MEX)"}, {n:24, p:"루이스 차베스", c:"디나모 모스크바 (RUS)"}, {n:26, p:"브라이언 구티에레스", c:"CD 과달라하라 (MEX)"}],
+            FW: [{n:9, p:"라울 히메네스", c:"풀럼 FC (ENG)"}, {n:10, p:"알렉시스 베가", c:"톨루카 FC (MEX)"}, {n:11, p:"산티아고 히메네스", c:"AC 밀란 (ITA)"}, {n:14, p:"아르만도 곤살레스", c:"CD 과달라하라 (MEX)"}, {n:16, p:"훌리안 퀴뇨네스", c:"알 카디시아 (KSA)"}, {n:21, p:"세사르 우에르타", c:"RSC 안데를레흐트 (BEL)"}, {n:22, p:"기예르모 마르티네스", c:"푸마스 UNAM (MEX)"}, {n:25, p:"로베르토 알바라도", c:"CD 과달라하라 (MEX)"}]
+        },
+        "USA": {
+            name: "미국", rank: "16위", flag: "🇺🇸",
+            GK: [{n:1, p:"멧 터너", c:"뉴잉글랜드 레볼루션 (USA)"}, {n:24, p:"멧 프리즈", c:"뉴욕 시티 FC (USA)"}, {n:25, p:"크리스 브레이디", c:"시카고 파이어 (USA)"}],
+            DF: [{n:2, p:"세르지뇨 데스트", c:"PSV 에인트호번 (NED)"}, {n:3, p:"크리스 리차즈", c:"크리스탈 팰리스 (ENG)"}, {n:5, p:"앤토니 로빈슨", c:"풀럼 FC (ENG)"}, {n:6, p:"오스톤 트러스티", c:"셀틱 FC (SCO)"}, {n:12, p:"마일스 로빈슨", c:"FC 신시내티 (USA)"}, {n:13, p:"팀 림", c:"샬럿 FC (USA)"}, {n:16, p:"알렉스 프리먼", c:"비야레알 CF (ESP)"}, {n:18, p:"맥스 아프스텐", c:"콜럼버스 크루 (USA)"}, {n:22, p:"마크 맥켄지", c:"툴루즈 FC (FRA)"}, {n:23, p:"조 스캘리", c:"보루시아 묀헨글라트바흐 (GER)"}],
+            MF: [{n:4, p:"타일러 아담스", c:"AFC 본머스 (ENG)"}, {n:7, p:"지오반니 레이나", c:"보루시아 묀헨글라트바흐 (GER)"}, {n:8, p:"웨스턴 맥케니", c:"유벤투스 FC (ITA)"}, {n:14, p:"세바스찬 베어할터", c:"밴쿠버 화이트캡스 (CAN)"}, {n:15, p:"크리스티안 롤단", c:"시애틀 사운더스 (USA)"}, {n:17, p:"말릭 틸만", c:"바이어 레버쿠젠 (GER)"}],
+            FW: [{n:9, p:"리카르도 페피", c:"PSV 에인트호번 (NED)"}, {n:10, p:"크리스티안 풀리식", c:"AC 밀란 (ITA)"}, {n:11, p:"브렌든 에런슨", c:"리즈 유나이티드 (ENG)"}, {n:19, p:"하지 라이트", c:"코번트리 시티 (ENG)"}, {n:20, p:"폴라린 발로건", c:"AS 모나코 (FRA)"}, {n:21, p:"티모시 웨아", c:"올랭피크 마르세유 (FRA)"}, {n:26, p:"알렉스 센데하스", c:"클럽 아메리카 (MEX)"}]
+        },
+        "URU": {
+            name: "우루과이", rank: "17위", flag: "🇺🇾",
+            GK: [{n:1, p:"세르히오 로체트", c:"인테르나시오날 (BRA)"}, {n:12, p:"산티아고 메레", c:"CF 몬테레이 (MEX)"}, {n:23, p:"페르난도 무스레라", c:"에스투디안테스 (ARG)"}],
+            DF: [{n:2, p:"호세 마리아 히메네스", c:"아틀레티코 마드리드 (ESP)"}, {n:3, p:"세바스티안 카세레스", c:"클럽 아메리카 (MEX)"}, {n:4, p:"로날드 아라우호", c:"FC 바르셀로나 (ESP)"}, {n:13, p:"기예르모 바렐라", c:"CR 플라멩구 (BRA)"}, {n:16, p:"마티아스 올리베라", c:"SSC 나폴리 (ITA)"}, {n:17, p:"마티아스 비냐", c:"리버 플레이트 (ARG)"}, {n:24, p:"산티아고 부에노", c:"우드버햄튼 (ENG)"}],
+            MF: [{n:5, p:"마누엘 우가르테", c:"맨체스터 유나이티드 (ENG)"}, {n:6, p:"로드리고 벤탄쿠르", c:"토트넘 (ENG)"}, {n:7, p:"니콜라스 데 라 크루스", c:"CR 플라멩구 (BRA)"}, {n:8, p:"페데리코 발베르데", c:"레알 마드리드 (ESP)"}, {n:10, p:"데 아라스카에타", c:"CR 플라멩구 (BRA)"}, {n:14, p:"아구스틴 카노비오", c:"플루미넨시 (BRA)"}, {n:15, p:"에밀리아노 마르티네스", c:"SE 파우메이라스 (BRA)"}, {n:20, p:"막시 아라우호", c:"스포르팅 CP (POR)"}, {n:22, p:"호아킨 피케레즈", c:"SE 파우메이라스 (BRA)"}, {n:25, p:"후안 사나브리아", c:"리얼 솔트레이크 (USA)"}, {n:26, p:"로드리고 살라사르", c:"SC 브라가 (POR)"}],
+            FW: [{n:9, p:"다윈 누녜스", c:"알 힐랄 SC (KSA)"}, {n:11, p:"파쿤도 펠리스트리", c:"파나티나이코스 (GRE)"}, {n:18, p:"브라이언 로드리게스", c:"클럽 아메리카 (MEX)"}, {n:19, p:"로드리고 아기레", c:"티그레스 UANL (MEX)"}, {n:21, p:"페데리코 비냐스", c:"레알 오비에도 (ESP)"}]
+        }
+    };
 
-        <!-- 글로벌 통합 필터링/검색 컨트롤 도구 -->
-        <section class="mb-8 flex flex-col md:flex-row gap-4 items-center">
-            <div class="relative flex-1 w-full">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </span>
-                <input type="text" id="global-search" placeholder="국가 한글/영문 이름, 선수 한글명, 또는 소속 축구 클럽을 즉시 검색해보세요..." class="w-full pl-12 pr-4 py-3.5 bg-slate-900/60 border border-slate-800/80 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm placeholder-slate-500 text-slate-100 transition-all outline-none" />
-            </div>
-            <div class="flex items-center gap-2 self-end md:self-auto shrink-0">
-                <button onclick="setViewMode('GROUP')" id="btn-view-GROUP" class="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/10">
-                    조별 리그 기준 (A~L조)
-                </button>
-                <button onclick="setViewMode('GRID')" id="btn-view-GRID" class="px-4 py-2 text-xs font-semibold rounded-xl hover:bg-slate-900 text-slate-300 border border-slate-800 transition-all flex items-center gap-2">
-                    단일 리스트 정렬
-                </button>
-            </div>
-        </section>
+    // 포지션 렌더링 순서 및 설정 정보
+    const positions = [
+        { key: "GK", title: "골키퍼 (GK)", badge: "badge-gk" },
+        { key: "DF", title: "수비수 (DF)", badge: "badge-df" },
+        { key: "MF", title: "미드필더 (MF)", badge: "badge-mf" },
+        { key: "FW", title: "공격수 (FW)", badge: "badge-fw" }
+    ];
 
-        <!-- 국가 리스트 그리드 메인 영역 -->
-        <main>
-            <h2 class="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
-                출전국 목록 <span id="country-count-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-emerald-400 ml-1">48</span>
-            </h2>
-            <div id="country-grid" class="space-y-10 block">
-                <!-- 조별 편성 또는 플랫 형태의 카드가 자바스크립트에 의해 주입됩니다 -->
-            </div>
-        </main>
-    </div>
+    // 초기 실행 환경 구성
+    window.addEventListener('DOMContentLoaded', () => {
+        const tabsBox = document.getElementById('tabsBox');
+        let firstCode = "";
 
-    <!-- 국가별 상세 스쿼드 명단 모달 (한글 중심 배치) -->
-    <div id="squad-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden shadow-2xl flex flex-col transform scale-95 transition-transform duration-300">
+        // 1. 상단 내비게이션 탭 버튼 동적 추가
+        Object.keys(worldCupSquads).forEach((code, index) => {
+            if(index === 0) firstCode = code;
+            const country = worldCupSquads[code];
             
-            <!-- 모달 상단 헤더 -->
-            <div class="p-6 border-b border-slate-800 bg-gradient-to-br from-emerald-950/20 via-slate-900 to-slate-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative">
-                <div class="flex items-center gap-4">
-                    <span id="modal-country-flag" class="text-5xl drop-shadow-md select-none">⚽</span>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h2 id="modal-country-name-ko" class="text-2xl font-bold text-slate-100">국가명</h2>
-                            <span id="modal-country-code" class="px-2 py-0.5 text-xs font-bold rounded bg-slate-800 text-emerald-400">CODE</span>
-                        </div>
-                        <p id="modal-country-name-en" class="text-xs sm:text-sm text-slate-400 mt-1 uppercase tracking-wider">English Country Name</p>
-                    </div>
-                </div>
-                
-                <!-- 상단 우측 닫기 단추 -->
-                <button onclick="closeSquadModal()" class="absolute top-4 right-4 sm:static p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-xl transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <!-- 모달 내부 통계 그래픽 & 실시간 스쿼드 검색 -->
-            <div class="p-6 bg-slate-900/50 border-b border-slate-800/60 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                <!-- 포지션 분포 분석 도구 -->
-                <div class="md:col-span-7 space-y-3">
-                    <div class="flex items-center justify-between text-xs text-slate-400">
-                        <span class="font-semibold text-slate-300">선수단 포지션 비중</span>
-                        <div class="flex gap-3">
-                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span>골키퍼(GK)</span>
-                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-blue-500"></span>수비수(DF)</span>
-                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span>미드필더(MF)</span>
-                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-red-500"></span>공격수(FW)</span>
-                        </div>
-                    </div>
-                    <!-- 프로그레스 형태 분포 바 -->
-                    <div id="position-distribution-bar" class="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden flex"></div>
-                    <div class="flex justify-between text-xs text-slate-400">
-                        <span id="modal-stat-summary" class="text-slate-300 font-medium">선수단 통계 요약 정보를 읽고 있습니다...</span>
-                    </div>
-                </div>
-
-                <!-- 모달 전용 명단 필터 링커 -->
-                <div class="md:col-span-5 relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </span>
-                    <input type="text" id="modal-search" placeholder="스쿼드 내 선수 한글명, 영문명, 클럽명 검색..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg text-xs placeholder-slate-500 text-slate-100 outline-none transition-colors" />
-                </div>
-            </div>
-
-            <!-- 포지션별 필터 가이드 탭 -->
-            <div class="px-6 py-3 border-b border-slate-800/60 bg-slate-900/30 flex gap-2 overflow-x-auto scrollbar-none">
-                <button onclick="setModalPositionFilter('ALL')" id="tab-pos-ALL" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-colors shrink-0">전체보기</button>
-                <button onclick="setModalPositionFilter('GK')" id="tab-pos-GK" class="px-4 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 text-slate-300 transition-colors shrink-0">골키퍼 (GK)</button>
-                <button onclick="setModalPositionFilter('DF')" id="tab-pos-DF" class="px-4 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 text-slate-300 transition-colors shrink-0">수비수 (DF)</button>
-                <button onclick="setModalPositionFilter('MF')" id="tab-pos-MF" class="px-4 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 text-slate-300 transition-colors shrink-0">미드필더 (MF)</button>
-                <button onclick="setModalPositionFilter('FW')" id="tab-pos-FW" class="px-4 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 text-slate-300 transition-colors shrink-0">공격수 (FW)</button>
-            </div>
-
-            <!-- 선수단 리스트 테이블/카드 레이아웃 복합뷰 -->
-            <div class="flex-1 overflow-y-auto p-6">
-                <!-- 데스크톱 버전 테이블 -->
-                <div class="hidden sm:block overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-800 text-xs font-semibold text-slate-400 bg-slate-900/60 uppercase">
-                                <th class="py-3 px-4 text-center w-16">등번호</th>
-                                <th class="py-3 px-4 w-24">포지션</th>
-                                <th class="py-3 px-4">선수 이름</th>
-                                <th class="py-3 px-4">생년월일</th>
-                                <th class="py-3 px-4">소속 클럽</th>
-                                <th class="py-3 px-4 text-right w-24">신장</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modal-squad-table-body" class="text-sm text-slate-200 divide-y divide-slate-800/40">
-                            <!-- 로우 주입구 -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- 모바일 전용 반응형 카드 그리드 -->
-                <div id="modal-squad-mobile-list" class="sm:hidden space-y-3"></div>
-
-                <!-- 검색 결과 미발생 시 경고 뷰 -->
-                <div id="modal-empty-state" class="hidden flex-col items-center justify-center py-12 text-slate-500 text-center">
-                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-sm text-slate-400 font-semibold">입력한 필터 조건에 부합하는 선수가 해당 국적에 없습니다.</p>
-                </div>
-            </div>
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+            btn.innerText = `${country.rank} ${country.name}`;
+            btn.setAttribute('data-code', code);
+            btn.onclick = (e) => switchTab(code, e.target);
             
-            <!-- 모달 종료 풋바 -->
-            <div class="px-6 py-4 border-t border-slate-800 bg-slate-900/40 flex justify-end">
-                <button onclick="closeSquadModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-colors border border-slate-700">
-                    창 닫기
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 비즈니스 핵심 코어 데이터베이스 모듈 -->
-    <script>
-        // PDF.js 워커 바인딩
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        // 2026 월드컵 본선 공식 48개국 완벽 한글 매핑 딕셔너리
-        const countryKoMap = {
-            'MEX': '멕시코', 'RSA': '남아프리카공화국', 'KOR': '대한민국', 'CZE': '체코',
-            'CAN': '캐나다', 'BIH': '보스니아 헤르체고비나', 'QAT': '카타르', 'SUI': '스위스',
-            'BRA': '브라질', 'MAR': '모로코', 'HAI': '아이티', 'SCO': '스코틀랜드',
-            'USA': '미국', 'PAR': '파라과이', 'AUS': '호주', 'TUR': '튀르키예',
-            'GER': '독일', 'CUW': '퀴라소', 'CIV': '코트디부아르', 'ECU': '에콰도르',
-            'NED': '네덜란드', 'JPN': '일본', 'SWE': '스웨덴', 'TUN': '튀니지',
-            'BEL': '벨기에', 'EGY': '이집트', 'IRN': '이란', 'NZL': '뉴질랜드',
-            'ESP': '스페인', 'CPV': '카보베르데', 'KSA': '사우디아라비아', 'URU': '우루과이',
-            'FRA': '프랑스', 'SEN': '세네갈', 'IRQ': '이라크', 'NOR': '노르웨이',
-            'ARG': '아르헨티나', 'ALG': '알제리', 'AUT': '오스트리아', 'JOR': '요르단',
-            'POR': '포르투갈', 'COD': 'DR 콩고', 'UZB': '우즈베키스탄', 'COL': '콜롬비아',
-            'ENG': '잉글랜드', 'CRO': '크로아티아', 'GHA': '가나', 'PAN': '파나마'
-        };
-
-        // 이모지 변환용 피파 코드 매핑 리스트
-        const fifaToIsoMap = {
-            'MEX': 'MX', 'RSA': 'ZA', 'KOR': 'KR', 'CZE': 'CZ',
-            'CAN': 'CA', 'BIH': 'BA', 'QAT': 'QA', 'SUI': 'CH',
-            'BRA': 'BR', 'MAR': 'MA', 'HAI': 'HT', 'SCO': 'GB-SCT',
-            'USA': 'US', 'PAR': 'PY', 'AUS': 'AU', 'TUR': 'TR',
-            'GER': 'DE', 'CUW': 'CW', 'CIV': 'CI', 'ECU': 'EC',
-            'NED': 'NL', 'JPN': 'JP', 'SWE': 'SE', 'TUN': 'TN',
-            'BEL': 'BE', 'EGY': 'EG', 'IRN': 'IR', 'NZL': 'NZ',
-            'ESP': 'ES', 'CPV': 'CV', 'KSA': 'SA', 'URU': 'UY',
-            'FRA': 'FR', 'SEN': 'SN', 'IRQ': 'IQ', 'NOR': 'NO',
-            'ARG': 'AR', 'ALG': 'DZ', 'AUT': 'AT', 'JOR': 'JO',
-            'POR': 'PT', 'COD': 'CD', 'UZB': 'UZ', 'COL': 'CO',
-            'ENG': 'GB-ENG', 'CRO': 'HR', 'GHA': 'GH', 'PAN': 'PA'
-        };
-
-        // FIFA 2026 공식 조 편성 레이아웃 데이터 (A조 ~ L조 48개국 완벽)
-        const GROUPS_CONFIG = {
-            'A': ['MEX', 'RSA', 'KOR', 'CZE'],
-            'B': ['CAN', 'BIH', 'QAT', 'SUI'],
-            'C': ['BRA', 'MAR', 'HAI', 'SCO'],
-            'D': ['USA', 'PAR', 'AUS', 'TUR'],
-            'E': ['GER', 'CUW', 'CIV', 'ECU'],
-            'F': ['NED', 'JPN', 'SWE', 'TUN'],
-            'G': ['BEL', 'EGY', 'IRN', 'NZL'],
-            'H': ['ESP', 'CPV', 'KSA', 'URU'],
-            'I': ['FRA', 'SEN', 'IRQ', 'NOR'],
-            'J': ['ARG', 'ALG', 'AUT', 'JOR'],
-            'K': ['POR', 'COD', 'UZB', 'COL'],
-            'L': ['ENG', 'CRO', 'GHA', 'PAN']
-        };
-
-        function getFlagEmoji(fifaCode) {
-            const iso = fifaToIsoMap[fifaCode];
-            if (!iso) return "⚽";
-            if (iso.startsWith('GB-')) {
-                if (iso === 'GB-ENG') return "🏴󠁧󠁢󠁥󠁮󠁧󠁿";
-                if (iso === 'GB-SCT') return "🏴󠁧󠁢󠁳󠁣󠁴󠁿";
-            }
-            return iso.toUpperCase().replace(/./g, char => 
-                String.fromCodePoint(char.charCodeAt(0) + 127397)
-            );
-        }
-
-        // 48개 전 출전국 공식 엔트리 기반 고가치 코어 한국어 데이터베이스 수립 (전체 한글화 완료)
-        const SQUAD_DATABASE = {
-            'MEX': {
-                name: "Mexico", code: "MEX",
-                players: [
-                    { number: "13", position: "GK", name: "Guillermo Ochoa", name_ko: "기예르모 오초아", dob: "13/07/1985", club: "AEL Limassol (CYP)", club_ko: "AEL 리마솔 (키프로스)", height: "185 cm" },
-                    { number: "4", position: "DF", name: "Edson Alvarez", name_ko: "에드손 알바레스", dob: "24/10/1997", club: "West Ham United (ENG)", club_ko: "웨스트햄 유나이티드 (잉글랜드)", height: "187 cm" },
-                    { number: "3", position: "DF", name: "Cesar Montes", name_ko: "세사르 몬테스", dob: "24/02/1997", club: "Lokomotiv Moscow (RUS)", club_ko: "로코모티프 모스크바 (러시아)", height: "191 cm" },
-                    { number: "5", position: "DF", name: "Johan Vasquez", name_ko: "요한 바스케스", dob: "22/10/1998", club: "Genoa CFC (ITA)", club_ko: "제노아 CFC (이탈리아)", height: "185 cm" },
-                    { number: "18", position: "MF", name: "Luis Chavez", name_ko: "루이스 차베스", dob: "15/01/1996", club: "Dynamo Moscow (RUS)", club_ko: "디나모 모스크바 (러시아)", height: "178 cm" },
-                    { number: "25", position: "MF", name: "Gilberto Mora", name_ko: "힐베르토 모라 (17세 최연소!)", dob: "14/10/2008", club: "Tijuana (MEX)", club_ko: "클루브 티후아나 (멕시코)", height: "172 cm" },
-                    { number: "9", position: "FW", name: "Santiago Gimenez", name_ko: "산티아고 히메네스", dob: "18/04/2001", club: "Feyenoord (NED)", club_ko: "페예노르트 (네덜란드)", height: "182 cm" },
-                    { number: "11", position: "FW", name: "Raul Jimenez", name_ko: "라울 히메네스", dob: "05/05/1991", club: "Fulham (ENG)", club_ko: "풀럼 (잉글랜드)", height: "190 cm" }
-                ]
-            },
-            'RSA': {
-                name: "South Africa", code: "RSA",
-                players: [
-                    { number: "1", position: "GK", name: "Ronwen Williams", name_ko: "론웬 윌리엄스", dob: "21/01/1992", club: "Mamelodi Sundowns (RSA)", club_ko: "마멜로디 선다운스 (남아공)", height: "184 cm" },
-                    { number: "2", position: "DF", name: "Khuliso Mudau", name_ko: "쿨리소 무다우", dob: "26/04/1995", club: "Mamelodi Sundowns (RSA)", club_ko: "마멜로디 선다운스 (남아공)", height: "180 cm" },
-                    { number: "4", position: "DF", name: "Aubrey Modiba", name_ko: "오브리 모디바", dob: "22/07/1995", club: "Mamelodi Sundowns (RSA)", club_ko: "마멜로디 선다운스 (남아공)", height: "170 cm" },
-                    { number: "8", position: "MF", name: "Teboho Mokoena", name_ko: "테보호 모코에나", dob: "24/01/1997", club: "Mamelodi Sundowns (RSA)", club_ko: "마멜로디 선다운스 (남아공)", height: "176 cm" },
-                    { number: "10", position: "FW", name: "Percy Tau", name_ko: "퍼시 타우", dob: "13/05/1994", club: "Al Ahly (EGY)", club_ko: "알 아흘리 (이집트)", height: "175 cm" },
-                    { number: "9", position: "FW", name: "Lyle Foster", name_ko: "라일 포스터", dob: "03/09/2000", club: "Burnley (ENG)", club_ko: "번리 (잉글랜드)", height: "185 cm" }
-                ]
-            },
-            'KOR': {
-                name: "Korea Republic", code: "KOR",
-                players: [
-                    { number: "7", position: "FW", name: "SON Heungmin", name_ko: "손흥민 (캡틴)", dob: "08/07/1992", club: "Tottenham Hotspur (ENG)", club_ko: "토트넘 홋스퍼 (잉글랜드)", height: "183 cm" },
-                    { number: "4", position: "DF", name: "KIM Minjae", name_ko: "김민재", dob: "15/11/1996", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "190 cm" },
-                    { number: "18", position: "MF", name: "LEE Kangin", name_ko: "이강인", dob: "19/02/2001", club: "Paris Saint-Germain (FRA)", club_ko: "파리 생제르맹 (프랑스)", height: "173 cm" },
-                    { number: "11", position: "FW", name: "HWANG Heechan", name_ko: "황희찬", dob: "26/01/1996", club: "Wolverhampton Wanderers (ENG)", club_ko: "울버햄튼 원더러스 (잉글랜드)", height: "177 cm" },
-                    { number: "21", position: "GK", name: "JO Hyeonwoo", name_ko: "조현우", dob: "25/09/1991", club: "Ulsan HD FC (KOR)", club_ko: "울산 HD FC (대한민국)", height: "189 cm" },
-                    { number: "10", position: "MF", name: "LEE Jaesung", name_ko: "이재성", dob: "10/08/1992", club: "Mainz 05 (GER)", club_ko: "마인츠 05 (독일)", height: "180 cm" },
-                    { number: "6", position: "MF", name: "HWANG Inbeom", name_ko: "황인범", dob: "20/09/1996", club: "Feyenoord (NED)", club_ko: "페예노르트 (네덜란드)", height: "177 cm" },
-                    { number: "22", position: "DF", name: "SEOL Youngwoo", name_ko: "설영우", dob: "05/12/1998", club: "Crvena zvezda (SRB)", club_ko: "츠르베나 즈베즈다 (세르비아)", height: "180 cm" },
-                    { number: "8", position: "MF", name: "BAE Junho", name_ko: "배준호", dob: "21/08/2003", club: "Stoke City (ENG)", club_ko: "스토크 시티 (잉글랜드)", height: "178 cm" },
-                    { number: "17", position: "MF", name: "EOM Jisung", name_ko: "엄지성", dob: "09/05/2002", club: "Swansea City (WAL)", club_ko: "스완지 시티 (웨일스)", height: "178 cm" },
-                    { number: "15", position: "DF", name: "Jens Castrop", name_ko: "옌스 카스트롭 (귀화 수비수!)", dob: "29/07/2003", club: "1. FC Nürnberg (GER)", club_ko: "FC 뉘른베르크 (독일)", height: "179 cm" }
-                ]
-            },
-            'CZE': {
-                name: "Czech Republic", code: "CZE",
-                players: [
-                    { number: "1", position: "GK", name: "Jindrich Stanek", name_ko: "인드르지흐 스타네크", dob: "27/04/1996", club: "Slavia Prague (CZE)", club_ko: "슬라비아 프라하 (체코)", height: "192 cm" },
-                    { number: "4", position: "DF", name: "Ladislav Krejci", name_ko: "라디슬라프 크레이치", dob: "20/04/1999", club: "Girona FC (ESP)", club_ko: "지로나 FC (스페인)", height: "191 cm" },
-                    { number: "5", position: "DF", name: "Vladimir Coufal", name_ko: "블라디미르 초우팔", dob: "22/08/1992", club: "West Ham United (ENG)", club_ko: "웨스트햄 유나이티드 (잉글랜드)", height: "179 cm" },
-                    { number: "22", position: "MF", name: "Tomas Soucek", name_ko: "토마스 수체크", dob: "27/02/1995", club: "West Ham United (ENG)", club_ko: "웨스트햄 유나이티드 (잉글랜드)", height: "192 cm" },
-                    { number: "10", position: "FW", name: "Patrik Schick", name_ko: "파트리크 시크", dob: "24/01/1996", club: "Bayer Leverkusen (GER)", club_ko: "바이어 레버쿠젠 (독일)", height: "187 cm" },
-                    { number: "9", position: "FW", name: "Adam Hlozek", name_ko: "아담 흘로제크", dob: "25/07/2002", club: "TSG Hoffenheim (GER)", club_ko: "TSG 호펜하임 (독일)", height: "188 cm" }
-                ]
-            },
-            'CAN': {
-                name: "Canada", code: "CAN",
-                players: [
-                    { number: "19", position: "DF", name: "Alphonso Davies", name_ko: "알폰소 데이비스", dob: "02/11/2000", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "185 cm" },
-                    { number: "20", position: "FW", name: "Jonathan David", name_ko: "조나단 데이비드", dob: "14/01/2000", club: "Juventus FC (ITA)", club_ko: "유벤투스 FC (이탈리아)", height: "178 cm" },
-                    { number: "7", position: "MF", name: "Stephen Eustaquio", name_ko: "스테펜 에우스타키오", dob: "21/12/1996", club: "FC Porto (POR)", club_ko: "FC 포르투 (포르투갈)", height: "178 cm" },
-                    { number: "9", position: "FW", name: "Cyle Larin", name_ko: "카일 라린", dob: "17/04/1995", club: "RCD Mallorca (ESP)", club_ko: "RCD 마요르카 (스페인)", height: "188 cm" },
-                    { number: "11", position: "MF", name: "Tajon Buchanan", name_ko: "테이전 뷰캐넌", dob: "08/02/1999", club: "Inter Milan (ITA)", club_ko: "인터 밀란 (이탈리아)", height: "183 cm" },
-                    { number: "2", position: "DF", name: "Alistair Johnston", name_ko: "알리스테어 존스턴", dob: "08/10/1998", club: "Celtic FC (SCO)", club_ko: "셀틱 FC (스코틀랜드)", height: "180 cm" }
-                ]
-            },
-            'BIH': {
-                name: "Bosnia and Herzegovina", code: "BIH",
-                players: [
-                    { number: "11", position: "FW", name: "Edin Dzeko", name_ko: "에딘 제코 (레전드)", dob: "17/03/1986", club: "Fenerbahce (TUR)", club_ko: "페네르바체 (튀르키예)", height: "193 cm" },
-                    { number: "3", position: "DF", name: "Sead Kolasinac", name_ko: "세아드 콜라시나치", dob: "20/06/1993", club: "Atalanta BC (ITA)", club_ko: "아탈란타 BC (이탈리아)", height: "183 cm" },
-                    { number: "2", position: "DF", name: "Amar Dedic", name_ko: "아마르 데디치", dob: "18/08/2002", club: "Red Bull Salzburg (AUT)", club_ko: "레드불 잘츠부르크 (오스트리아)", height: "180 cm" },
-                    { number: "9", position: "FW", name: "Ermedin Demirovic", name_ko: "에르메딘 데미로비치", dob: "25/03/1998", club: "VfB Stuttgart (GER)", club_ko: "VfB 슈투트가르트 (독일)", height: "187 cm" },
-                    { number: "8", position: "MF", name: "Benjamin Tahirovic", name_ko: "벤야민 타히로비치", dob: "03/03/2003", club: "Ajax (NED)", club_ko: "아약스 (네덜란드)", height: "186 cm" },
-                    { number: "6", position: "MF", name: "Denis Huseinbasic", name_ko: "데니스 후세인바시치", dob: "03/07/2001", club: "1. FC Koln (GER)", club_ko: "FC 쾰른 (독일)", height: "184 cm" }
-                ]
-            },
-            'QAT': {
-                name: "Qatar", code: "QAT",
-                players: [
-                    { number: "11", position: "FW", name: "Akram Afif", name_ko: "아크람 아피프", dob: "11/03/1996", club: "Al Sadd SC (QAT)", club_ko: "알 사드 SC (카타르)", height: "177 cm" },
-                    { number: "19", position: "FW", name: "Almoez Ali", name_ko: "알모에즈 알리", dob: "19/08/1996", club: "Al-Duhail (QAT)", club_ko: "알 두하일 (카타르)", height: "180 cm" },
-                    { number: "22", position: "GK", name: "Meshaal Barsham", name_ko: "메샬 바르샴", dob: "14/02/1998", club: "Al Sadd SC (QAT)", club_ko: "알 사드 SC (카타르)", height: "180 cm" },
-                    { number: "16", position: "DF", name: "Boualem Khoukhi", name_ko: "부알렘 쿠키", dob: "07/09/1990", club: "Al Sadd SC (QAT)", club_ko: "알 사드 SC (카타르)", height: "182 cm" },
-                    { number: "10", position: "MF", name: "Hassan Al-Haydos", name_ko: "하산 알하이도스", dob: "11/12/1990", club: "Al Sadd SC (QAT)", club_ko: "알 사드 SC (카타르)", height: "174 cm" },
-                    { number: "3", position: "DF", name: "Lucas Mendes", name_ko: "루카스 멘데스", dob: "03/07/1990", club: "Al-Wakrah (QAT)", club_ko: "알 와크라 (카타르)", height: "185 cm" }
-                ]
-            },
-            'SUI': {
-                name: "Switzerland", code: "SUI",
-                players: [
-                    { number: "10", position: "MF", name: "Granit Xhaka", name_ko: "그라니트 자카", dob: "27/09/1992", club: "Bayer Leverkusen (GER)", club_ko: "바이어 레버쿠젠 (독일)", height: "185 cm" },
-                    { number: "5", position: "DF", name: "Manuel Akanji", name_ko: "마누엘 아칸지", dob: "19/07/1995", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "188 cm" },
-                    { number: "1", position: "GK", name: "Gregor Kobel", name_ko: "그레고르 코벨", dob: "06/12/1997", club: "Borussia Dortmund (GER)", club_ko: "보루시아 도르트문트 (독일)", height: "194 cm" },
-                    { number: "21", position: "GK", name: "Yann Sommer", name_ko: "얀 조머", dob: "17/12/1988", club: "Inter Milan (ITA)", club_ko: "인터 밀란 (이탈리아)", height: "183 cm" },
-                    { number: "7", position: "FW", name: "Breel Embolo", name_ko: "브릴 엠볼로", dob: "14/02/1997", club: "AS Monaco (FRA)", club_ko: "AS 모나코 (프랑스)", height: "187 cm" },
-                    { number: "8", position: "MF", name: "Remo Freuler", name_ko: "레모 프로일러", dob: "15/04/1992", club: "Bologna (ITA)", club_ko: "볼로냐 FC (이탈리아)", height: "181 cm" },
-                    { number: "6", position: "MF", name: "Denis Zakaria", name_ko: "데니스 자카리아", dob: "20/11/1996", club: "AS Monaco (FRA)", club_ko: "AS 모나코 (프랑스)", height: "191 cm" }
-                ]
-            },
-            'BRA': {
-                name: "Brazil", code: "BRA",
-                players: [
-                    { number: "7", position: "FW", name: "Vinicius Jr", name_ko: "비니시우스 주니오르", dob: "12/07/2000", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "176 cm" },
-                    { number: "10", position: "FW", name: "Neymar Jr", name_ko: "네이마르", dob: "05/02/1992", club: "Santos FC (BRA)", club_ko: "산토스 FC (브라질)", height: "175 cm" },
-                    { number: "11", position: "FW", name: "Rodrygo", name_ko: "호드리구", dob: "09/01/2001", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "174 cm" },
-                    { number: "9", position: "FW", name: "Endrick", name_ko: "엔드릭", dob: "21/07/2006", club: "Olympique Lyonnais (FRA)", club_ko: "올랭피크 리옹 (프랑스)", height: "173 cm" },
-                    { number: "4", position: "DF", name: "Marquinhos", name_ko: "마르키뉴스", dob: "14/05/1994", club: "Paris Saint-Germain (FRA)", club_ko: "파리 생제르맹 (프랑스)", height: "183 cm" },
-                    { number: "1", position: "GK", name: "Alisson", name_ko: "알리송 베커", dob: "02/10/1992", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "193 cm" },
-                    { number: "5", position: "MF", name: "Bruno Guimaraes", name_ko: "브루노 기마랑이스", dob: "16/11/1997", club: "Newcastle United (ENG)", club_ko: "뉴캐슬 유나이티드 (잉글랜드)", height: "182 cm" },
-                    { number: "8", position: "MF", name: "Lucas Paqueta", name_ko: "루카스 파케타", dob: "27/08/1997", club: "West Ham United (ENG)", club_ko: "웨스트햄 유나이티드 (잉글랜드)", height: "180 cm" }
-                ]
-            },
-            'MAR': {
-                name: "Morocco", code: "MAR",
-                players: [
-                    { number: "2", position: "DF", name: "Achraf Hakimi", name_ko: "아치라프 하키미", dob: "04/11/1998", club: "Paris Saint-Germain (FRA)", club_ko: "파리 생제르맹 (프랑스)", height: "181 cm" },
-                    { number: "10", position: "MF", name: "Brahim Diaz", name_ko: "브라힘 디아스", dob: "03/08/1999", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "171 cm" },
-                    { number: "1", position: "GK", name: "Yassine Bounou", name_ko: "야신 부누", dob: "05/04/1991", club: "Al Hilal (KSA)", club_ko: "알 힐랄 (사우디)", height: "192 cm" },
-                    { number: "7", position: "FW", name: "Hakim Ziyech", name_ko: "하킴 지예흐", dob: "19/03/1993", club: "Galatasaray (TUR)", club_ko: "갈라타사라이 (튀르키예)", height: "180 cm" },
-                    { number: "4", position: "MF", name: "Sofyan Amrabat", name_ko: "소프앙 암라바트", dob: "21/08/1996", club: "Fenerbahce (TUR)", club_ko: "페네르바체 (튀르키예)", height: "185 cm" },
-                    { number: "5", position: "DF", name: "Nayef Aguerd", name_ko: "나예프 아구에르드", dob: "30/03/1996", club: "Real Sociedad (ESP)", club_ko: "레알 소시에다드 (스페인)", height: "190 cm" }
-                ]
-            },
-            'HAI': {
-                name: "Haiti", code: "HAI",
-                players: [
-                    { number: "10", position: "MF", name: "Jean-Ricner Bellegarde", name_ko: "장리크네르 벨가르드", dob: "27/06/1998", club: "Wolverhampton Wanderers (ENG)", club_ko: "울버햄튼 (잉글랜드)", height: "170 cm" },
-                    { number: "9", position: "FW", name: "Duckens Nazon", name_ko: "두켄스 나종", dob: "07/04/1994", club: "Esteghlal FC (IRN)", club_ko: "에스테글랄 (이란)", height: "181 cm" },
-                    { number: "11", position: "FW", name: "Frantzdy Pierrot", name_ko: "프란츠디 피에로", dob: "29/03/1995", club: "AEK Athens (GRE)", club_ko: "AEK 아테네 (그리스)", height: "194 cm" },
-                    { number: "6", position: "MF", name: "Danley Jean Jacques", name_ko: "단레이 장 자크", dob: "20/05/1998", club: "Metz (FRA)", club_ko: "FC 메스 (프랑스)", height: "184 cm" },
-                    { number: "2", position: "DF", name: "Carlens Arcus", name_ko: "칼렌스 아르퀴스", dob: "06/02/1996", club: "Angers SCO (FRA)", club_ko: "앙제 SCO (프랑스)", height: "180 cm" },
-                    { number: "1", position: "GK", name: "Johny Placide", name_ko: "조니 플라시드", dob: "29/01/1888", club: "Bastia (FRA)", club_ko: "SC 바스티아 (프랑스)", height: "181 cm" }
-                ]
-            },
-            'SCO': {
-                name: "Scotland", code: "SCO",
-                players: [
-                    { number: "3", position: "DF", name: "Andy Robertson", name_ko: "앤디 로버트슨", dob: "11/03/1994", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "178 cm" },
-                    { number: "4", position: "MF", name: "Scott McTominay", name_ko: "스콧 맥토미니", dob: "08/12/1996", club: "Napoli (ITA)", club_ko: "나폴리 (이탈리아)", height: "193 cm" },
-                    { number: "1", position: "GK", name: "Craig Gordon", name_ko: "크레이그 고든 (43세 최고령!)", dob: "31/12/1982", club: "Heart of Midlothian (SCO)", club_ko: "하츠 오브 미들로디언 (스코틀랜드)", height: "193 cm" },
-                    { number: "7", position: "MF", name: "John McGinn", name_ko: "존 맥긴", dob: "18/10/1994", club: "Aston Villa (ENG)", club_ko: "아스톤 빌라 (잉글랜드)", height: "178 cm" },
-                    { number: "8", position: "MF", name: "Billy Gilmour", name_ko: "빌리 길모어", dob: "11/06/2001", club: "Napoli (ITA)", club_ko: "나폴리 (이탈리아)", height: "170 cm" },
-                    { number: "10", position: "FW", name: "Che Adams", name_ko: "체 애덤스", dob: "13/07/1996", club: "Torino (ITA)", club_ko: "토리노 FC (이탈리아)", height: "175 cm" }
-                ]
-            },
-            'USA': {
-                name: "United States", code: "USA",
-                players: [
-                    { number: "10", position: "FW", name: "Christian Pulisic", name_ko: "크리스천 풀리식", dob: "18/09/1998", club: "AC Milan (ITA)", club_ko: "AC 밀란 (이탈리아)", height: "177 cm" },
-                    { number: "8", position: "MF", name: "Weston McKennie", name_ko: "웨스턴 맥케니", dob: "28/08/1998", club: "Juventus FC (ITA)", club_ko: "유벤투스 FC (이탈리아)", height: "185 cm" },
-                    { number: "4", position: "MF", name: "Tyler Adams", name_ko: "타일러 애덤스", dob: "14/02/1999", club: "Bournemouth (ENG)", club_ko: "본머스 (잉글랜드)", height: "175 cm" },
-                    { number: "5", position: "DF", name: "Antonee Robinson", name_ko: "안토니 로빈슨", dob: "08/08/1997", club: "Fulham (ENG)", club_ko: "풀럼 (잉글랜드)", height: "175 cm" },
-                    { number: "20", position: "FW", name: "Folarin Balogun", name_ko: "폴라린 발로건", dob: "03/07/2001", club: "AS Monaco (FRA)", club_ko: "AS 모나코 (프랑스)", height: "178 cm" },
-                    { number: "21", position: "FW", name: "Timothy Weah", name_ko: "티모시 웨아", dob: "22/02/2000", club: "Juventus (ITA)", club_ko: "유벤투스 FC (이탈리아)", height: "178 cm" }
-                ]
-            },
-            'PAR': {
-                name: "Paraguay", code: "PAR",
-                players: [
-                    { number: "10", position: "FW", name: "Julio Enciso", name_ko: "훌리오 엔시소", dob: "23/01/2004", club: "Brighton & Hove Albion (ENG)", club_ko: "브라이튼 (잉글랜드)", height: "173 cm" },
-                    { number: "24", position: "MF", name: "Miguel Almiron", name_ko: "미겔 알미론", dob: "10/02/1994", club: "Newcastle United (ENG)", club_ko: "뉴캐슬 유나이티드 (잉글랜드)", height: "174 cm" },
-                    { number: "15", position: "DF", name: "Gustavo Gomez", name_ko: "구스타보 고메스", dob: "06/05/1993", club: "Palmeiras (BRA)", club_ko: "파우메이라스 (브라질)", height: "185 cm" },
-                    { number: "3", position: "DF", name: "Omar Alderete", name_ko: "오마르 알데레테", dob: "26/12/1996", club: "Getafe CF (ESP)", club_ko: "헤타페 CF (스페인)", height: "188 cm" },
-                    { number: "9", position: "FW", name: "Antonio Sanabria", name_ko: "안토니오 사나브리아", dob: "04/03/1996", club: "Torino (ITA)", club_ko: "토리노 FC (이탈리아)", height: "181 cm" },
-                    { number: "23", position: "MF", name: "Mathias Villasanti", name_ko: "마티아스 비야산티", dob: "05/02/1997", club: "Gremio (BRA)", club_ko: "그레미우 (브라질)", height: "178 cm" }
-                ]
-            },
-            'AUS': {
-                name: "Australia", code: "AUS",
-                players: [
-                    { number: "1", position: "GK", name: "Mathew Ryan", name_ko: "매튜 라이언", dob: "08/04/1992", club: "AS Roma (ITA)", club_ko: "AS 로마 (이탈리아)", height: "184 cm" },
-                    { number: "19", position: "DF", name: "Harry Souttar", name_ko: "해리 수타", dob: "22/10/1998", club: "Sheffield United (ENG)", club_ko: "셰필드 유나이티드 (잉글랜드)", height: "200 cm" },
-                    { number: "22", position: "MF", name: "Jackson Irvine", name_ko: "잭슨 어바인", dob: "07/03/1993", club: "St. Pauli (GER)", club_ko: "장크트 파울리 (독일)", height: "189 cm" },
-                    { number: "11", position: "FW", name: "Craig Goodwin", name_ko: "크레이그 굿윈", dob: "16/12/1991", club: "Al-Wehda (KSA)", club_ko: "알 웨흐다 (사우디)", height: "180 cm" },
-                    { number: "15", position: "FW", name: "Mitchell Duke", name_ko: "미첼 듀크", dob: "18/01/1991", club: "Machida Zelvia (JPN)", club_ko: "마치다 젤비아 (일본)", height: "186 cm" },
-                    { number: "3", position: "DF", name: "Alessandro Circati", name_ko: "알레산드로 치르카티", dob: "10/10/2003", club: "Parma (ITA)", club_ko: "파르마 (이탈리아)", height: "190 cm" }
-                ]
-            },
-            'TUR': {
-                name: "Türkiye", code: "TUR",
-                players: [
-                    { number: "8", position: "MF", name: "Arda Guler", name_ko: "아르다 귈러 (신성)", dob: "25/02/2005", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "175 cm" },
-                    { number: "10", position: "MF", name: "Hakan Calhanoglu", name_ko: "하칸 찰하놀루", dob: "08/02/1994", club: "Inter Milan (ITA)", club_ko: "인터 밀란 (이탈리아)", height: "178 cm" },
-                    { number: "9", position: "FW", name: "Baris Alper Yilmaz", name_ko: "바리시 알페르 일마즈", dob: "23/05/2000", club: "Galatasaray (TUR)", club_ko: "갈라타사라이 (튀르키예)", height: "186 cm" },
-                    { number: "11", position: "FW", name: "Kenan Yildiz", name_ko: "케난 일디즈", dob: "04/05/2005", club: "Juventus (ITA)", club_ko: "유벤투스 FC (이탈리아)", height: "185 cm" },
-                    { number: "6", position: "MF", name: "Orkun Kokcu", name_ko: "오르쿤 쾨크취", dob: "29/12/2000", club: "Benfica (POR)", club_ko: "벤피카 (포르투갈)", height: "175 cm" },
-                    { number: "7", position: "FW", name: "Kerem Akturkoglu", name_ko: "케렘 아크튀르콜루", dob: "21/10/1998", club: "Benfica (POR)", club_ko: "벤피카 (포르투갈)", height: "173 cm" }
-                ]
-            },
-            'GER': {
-                name: "Germany", code: "GER",
-                players: [
-                    { number: "10", position: "MF", name: "Florian Wirtz", name_ko: "플로리안 비르츠", dob: "03/05/2003", club: "Bayer Leverkusen (GER)", club_ko: "바이어 레버쿠젠 (독일)", height: "176 cm" },
-                    { number: "14", position: "MF", name: "Jamal Musiala", name_ko: "자말 무시아라", dob: "26/02/2003", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "180 cm" },
-                    { number: "1", position: "GK", name: "Manuel Neuer", name_ko: "마누엘 노이어 (40세)", dob: "27/03/1986", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "193 cm" },
-                    { number: "2", position: "DF", name: "Antonio Rudiger", name_ko: "안토니오 뤼디거", dob: "03/03/1993", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "190 cm" },
-                    { number: "7", position: "FW", name: "Kai Havertz", name_ko: "카이 하베르츠", dob: "11/06/1999", club: "Arsenal FC (ENG)", club_ko: "아스널 FC (잉글랜드)", height: "193 cm" },
-                    { number: "6", position: "MF", name: "Joshua Kimmich", name_ko: "요주아 키미히", dob: "08/02/1995", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "177 cm" }
-                ]
-            },
-            'CUW': {
-                name: "Curaçao", code: "CUW",
-                players: [
-                    { number: "7", position: "FW", name: "Jeremy Antonisse", name_ko: "제레미 안토니세 (최단신 축!)", dob: "29/03/2002", club: "Moreirense (POR)", club_ko: "모레이렌세 (포르투갈)", height: "164 cm" },
-                    { number: "10", position: "MF", name: "Juninho Bacuna", name_ko: "주니뉴 바쿠나", dob: "07/08/1997", club: "Al-Wehda (KSA)", club_ko: "알 웨흐다 (사우디)", height: "178 cm" },
-                    { number: "8", position: "MF", name: "Leandro Bacuna", name_ko: "레안드로 바쿠나", dob: "21/08/1991", club: "Groningen (NED)", club_ko: "FC 흐로닝언 (네덜란드)", height: "187 cm" },
-                    { number: "1", position: "GK", name: "Eloy Room", name_ko: "엘로이 룸", dob: "06/02/1989", club: "Vitesse (NED)", club_ko: "비테세 (네덜란드)", height: "190 cm" },
-                    { number: "11", position: "FW", name: "Gervane Kastaneer", name_ko: "헤르바네 카스타네르", dob: "09/06/1996", club: "Roda JC (NED)", club_ko: "로다 JC (네덜란드)", height: "185 cm" },
-                    { number: "9", position: "FW", name: "Tahith Chong", name_ko: "타히트 총", dob: "04/12/1999", club: "Luton Town (ENG)", club_ko: "루턴 타운 (잉글랜드)", height: "185 cm" }
-                ]
-            },
-            'CIV': {
-                name: "Ivory Coast", code: "CIV",
-                players: [
-                    { number: "8", position: "MF", name: "Franck Kessie", name_ko: "프랑크 케시에", dob: "19/12/1996", club: "Al-Ahli (KSA)", club_ko: "알 아흘리 (사우디)", height: "183 cm" },
-                    { number: "22", position: "FW", name: "Sebastien Haller", name_ko: "세바스티앙 알레", dob: "22/06/1994", club: "Leganes (ESP)", club_ko: "레가네스 (스페인)", height: "190 cm" },
-                    { number: "14", position: "FW", name: "Simon Adingra", name_ko: "시몬 아딩그라", dob: "01/01/2002", club: "Brighton & Hove Albion (ENG)", club_ko: "브라이튼 (잉글랜드)", height: "175 cm" },
-                    { number: "6", position: "MF", name: "Seko Fofana", name_ko: "세코 포파나", dob: "07/05/1995", club: "Al-Ettifaq (KSA)", club_ko: "알 에티파크 (사우디)", height: "185 cm" },
-                    { number: "21", position: "DF", name: "Evan Ndicka", name_ko: "에반 은디카", dob: "20/08/1999", club: "AS Roma (ITA)", club_ko: "AS 로마 (이탈리아)", height: "192 cm" },
-                    { number: "1", position: "GK", name: "Yahia Fofana", name_ko: "야히아 포파나", dob: "21/08/2000", club: "Angers (FRA)", club_ko: "앙제 SCO (프랑스)", height: "194 cm" }
-                ]
-            },
-            'ECU': {
-                name: "Ecuador", code: "ECU",
-                players: [
-                    { number: "23", position: "MF", name: "Moises Caicedo", name_ko: "모이세스 카이세도", dob: "02/11/2001", club: "Chelsea FC (ENG)", club_ko: "첼시 FC (잉글랜드)", height: "178 cm" },
-                    { number: "3", position: "DF", name: "Piero Hincapie", name_ko: "피에로 인카피에", dob: "09/01/2002", club: "Bayer Leverkusen (GER)", club_ko: "바이어 레버쿠젠 (독일)", height: "184 cm" },
-                    { number: "13", position: "FW", name: "Enner Valencia", name_ko: "에네르 발렌시아", dob: "04/11/1989", club: "Internacional (BRA)", club_ko: "인테르나시오나우 (브라질)", height: "177 cm" },
-                    { number: "6", position: "DF", name: "Willian Pacho", name_ko: "윌리안 파초", dob: "16/10/2001", club: "Paris Saint-Germain (FRA)", club_ko: "파리 생제르맹 (프랑스)", height: "187 cm" },
-                    { number: "10", position: "MF", name: "Kendry Paez", name_ko: "켄드리 파에스", dob: "04/05/2007", club: "Independiente del Valle (ECU)", club_ko: "인데펜디엔테 (에콰도르)", height: "177 cm" },
-                    { number: "7", position: "DF", name: "Pervis Estupinan", name_ko: "페르비스 에스투피냔", dob: "21/01/1998", club: "Brighton (ENG)", club_ko: "브라이튼 (잉글랜드)", height: "175 cm" }
-                ]
-            },
-            'NED': {
-                name: "Netherlands", code: "NED",
-                players: [
-                    { number: "4", position: "DF", name: "Virgil van Dijk", name_ko: "버질 반 다이크 (캡틴)", dob: "08/07/1991", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "195 cm" },
-                    { number: "14", position: "MF", name: "Tijjani Reijnders", name_ko: "티자니 라인데르스", dob: "29/07/1998", club: "AC Milan (ITA)", club_ko: "AC 밀란 (이탈리아)", height: "185 cm" },
-                    { number: "7", position: "FW", name: "Xavi Simons", name_ko: "사비 시몬스", dob: "21/04/2003", club: "RB Leipzig (GER)", club_ko: "RB 라이프치히 (독일)", height: "179 cm" },
-                    { number: "10", position: "FW", name: "Memphis Depay", name_ko: "멤피스 데파이", dob: "13/02/1994", club: "Corinthians (BRA)", club_ko: "코린치앙스 (브라질)", height: "176 cm" },
-                    { number: "11", position: "FW", name: "Cody Gakpo", name_ko: "코디 각포", dob: "07/05/1999", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "193 cm" },
-                    { number: "21", position: "MF", name: "Frenkie de Jong", name_ko: "프렌키 더 용", dob: "12/05/1997", club: "FC Barcelona (ESP)", club_ko: "FC 바르셀로나 (스페인)", height: "180 cm" }
-                ]
-            },
-            'JPN': {
-                name: "Japan", code: "JPN",
-                players: [
-                    { number: "7", position: "FW", name: "Kaoru Mitoma", name_ko: "미토마 카오루", dob: "20/05/1997", club: "Brighton & Hove Albion (ENG)", club_ko: "브라이튼 (잉글랜드)", height: "178 cm" },
-                    { number: "20", position: "MF", name: "Takefusa Kubo", name_ko: "쿠보 타케후사", dob: "04/06/2001", club: "Real Sociedad (ESP)", club_ko: "레알 소시에다드 (스페인)", height: "173 cm" },
-                    { number: "6", position: "MF", name: "Wataru Endo", name_ko: "엔도 와타루", dob: "09/02/1993", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "178 cm" },
-                    { number: "10", position: "MF", name: "Takumi Minamino", name_ko: "미나미노 타쿠미", dob: "16/01/1995", club: "AS Monaco (FRA)", club_ko: "AS 모나코 (프랑스)", height: "174 cm" },
-                    { number: "23", position: "GK", name: "Zion Suzuki", name_ko: "스즈키 자이온", dob: "21/08/2002", club: "Parma (ITA)", club_ko: "파르마 (이탈리아)", height: "190 cm" },
-                    { number: "8", position: "MF", name: "Ritsu Doan", name_ko: "도안 리츠", dob: "16/06/1998", club: "SC Freiburg (GER)", club_ko: "SC 프라이부르크 (독일)", height: "172 cm" }
-                ]
-            },
-            'SWE': {
-                name: "Sweden", code: "SWE",
-                players: [
-                    { number: "9", position: "FW", name: "Viktor Gyokeres", name_ko: "빅토르 요케레스", dob: "04/06/1998", club: "Sporting CP (POR)", club_ko: "스포르팅 CP (포르투갈)", height: "187 cm" },
-                    { number: "11", position: "FW", name: "Alexander Isak", name_ko: "알렉산더 이사크", dob: "21/09/1999", club: "Newcastle United (ENG)", club_ko: "뉴캐슬 유나이티드 (잉글랜드)", height: "192 cm" },
-                    { number: "21", position: "MF", name: "Dejan Kulusevski", name_ko: "데얀 쿨루셉스키", dob: "25/04/2000", club: "Tottenham Hotspur (ENG)", club_ko: "토트넘 홋스퍼 (잉글랜드)", height: "186 cm" },
-                    { number: "19", position: "FW", name: "Anthony Elanga", name_ko: "안토니 엘랑가", dob: "27/04/2002", club: "Nottingham Forest (ENG)", club_ko: "노팅엄 포레스트 (잉글랜드)", height: "178 cm" },
-                    { number: "10", position: "MF", name: "Emil Forsberg", name_ko: "에밀 포르스베리", dob: "23/10/1991", club: "New York Red Bulls (USA)", club_ko: "뉴욕 레드불스 (미국)", height: "179 cm" },
-                    { number: "3", position: "DF", name: "Victor Lindelof", name_ko: "빅토르 린델뢰프", dob: "17/07/1994", club: "Manchester United (ENG)", club_ko: "맨체스터 유나이티드 (잉글랜드)", height: "187 cm" }
-                ]
-            },
-            'TUN': {
-                name: "Tunisia", code: "TUN",
-                players: [
-                    { number: "4", position: "MF", name: "Ellyes Skhiri", name_ko: "엘리스 스키리", dob: "10/05/1995", club: "Eintracht Frankfurt (GER)", club_ko: "아인트라흐트 프랑크푸르트 (독일)", height: "185 cm" },
-                    { number: "10", position: "MF", name: "Hannibal Mejbri", name_ko: "한니발 메지브리", dob: "21/01/2003", club: "Burnley FC (ENG)", club_ko: "번리 FC (잉글랜드)", height: "182 cm" },
-                    { number: "14", position: "MF", name: "Aissa Laidouni", name_ko: "아이사 라이두니", dob: "13/12/1996", club: "Al-Wakrah (QAT)", club_ko: "알 와크라 (카타르)", height: "183 cm" },
-                    { number: "3", position: "DF", name: "Montassar Talbi", name_ko: "몬타사르 탈비", dob: "26/05/1998", club: "Lorient (FRA)", club_ko: "FC 로리앙 (프랑스)", height: "190 cm" },
-                    { number: "2", position: "DF", name: "Wajdi Kechrida", name_ko: "와지디 케치리다", dob: "05/11/1995", club: "Atromitos (GRE)", club_ko: "아트로미토스 (그리스)", height: "176 cm" },
-                    { number: "16", position: "GK", name: "Bechir Ben Said", name_ko: "베시르 벤 사이드", dob: "29/11/1992", club: "Esperance de Tunis (TUN)", club_ko: "에스페랑스 드 튀니스 (튀니지)", height: "188 cm" }
-                ]
-            },
-            'BEL': {
-                name: "Belgium", code: "BEL",
-                players: [
-                    { number: "7", position: "MF", name: "Kevin De Bruyne", name_ko: "케빈 더 브라위너", dob: "28/06/1991", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "181 cm" },
-                    { number: "10", position: "FW", name: "Romelu Lukaku", name_ko: "로멜루 루카쿠", dob: "13/05/1993", club: "Napoli (ITA)", club_ko: "나폴리 (이탈리아)", height: "191 cm" },
-                    { number: "11", position: "FW", name: "Jeremy Doku", name_ko: "제레미 도쿠", dob: "27/05/2002", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "171 cm" },
-                    { number: "24", position: "MF", name: "Amadou Onana", name_ko: "아마두 오나나", dob: "16/08/2001", club: "Aston Villa (ENG)", club_ko: "아스톤 빌라 (잉글랜드)", height: "195 cm" },
-                    { number: "9", position: "FW", name: "Lois Openda", name_ko: "로이스 오펜다", dob: "16/02/2000", club: "RB Leipzig (GER)", club_ko: "RB 라이프치히 (독일)", height: "177 cm" },
-                    { number: "1", position: "GK", name: "Koen Casteels", name_ko: "쿤 카스테일스", dob: "25/06/1992", club: "Al Qadsiah (KSA)", club_ko: "알 카디시야 (사우디)", height: "197 cm" }
-                ]
-            },
-            'EGY': {
-                name: "Egypt", code: "EGY",
-                players: [
-                    { number: "10", position: "FW", name: "Mohamed Salah", name_ko: "모하메드 살라", dob: "15/06/1992", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "175 cm" },
-                    { number: "22", position: "FW", name: "Omar Marmoush", name_ko: "오마르 마르무시", dob: "07/02/1999", club: "Eintracht Frankfurt (GER)", club_ko: "아인트라흐트 프랑크푸르트 (독일)", height: "183 cm" },
-                    { number: "19", position: "FW", name: "Mostafa Mohamed", name_ko: "모스타파 모하메드", dob: "28/11/1997", club: "Nantes (FRA)", club_ko: "FC 낭트 (프랑스)", height: "185 cm" },
-                    { number: "7", position: "MF", name: "Trezeguet", name_ko: "트레제게", dob: "01/10/1994", club: "Al-Rayyan (QAT)", club_ko: "알 라이얀 (카타르)", height: "180 cm" },
-                    { number: "17", position: "MF", name: "Mohamed Elneny", name_ko: "모하메드 엘네니", dob: "11/07/1992", club: "Al Jazira (UAE)", club_ko: "알 자지라 (UAE)", height: "180 cm" },
-                    { number: "6", position: "DF", name: "Ahmed Hegazi", name_ko: "아메드 헤가지", dob: "25/01/1991", club: "NEOM SC (KSA)", club_ko: "네옴 SC (사우디)", height: "193 cm" }
-                ]
-            },
-            'IRN': {
-                name: "IR Iran", code: "IRN",
-                players: [
-                    { number: "9", position: "FW", name: "Mehdi Taremi", name_ko: "메흐디 타레미", dob: "18/07/1992", club: "Inter Milan (ITA)", club_ko: "인터 밀란 (이탈리아)", height: "187 cm" },
-                    { number: "20", position: "FW", name: "Sardar Azmoun", name_ko: "사르다르 아즈문", dob: "01/01/1995", club: "Shabab Al Ahli (UAE)", club_ko: "샤바브 알 아흘리 (UAE)", height: "186 cm" },
-                    { number: "7", position: "MF", name: "Alireza Jahanbakhsh", name_ko: "알리레자 자한바크시", dob: "11/08/1993", club: "Heerenveen (NED)", club_ko: "헤이렌베인 (네덜란드)", height: "180 cm" },
-                    { number: "14", position: "MF", name: "Saman Ghoddos", name_ko: "사만 고도스", dob: "29/09/1993", club: "Ittihad Kalba (UAE)", club_ko: "이티하드 칼바 (UAE)", height: "176 cm" },
-                    { number: "4", position: "DF", name: "Shojae Khalilzadeh", name_ko: "쇼자에 칼릴자데", dob: "14/05/1989", club: "Tractor (IRN)", club_ko: "트락토르 (이란)", height: "185 cm" },
-                    { number: "1", position: "GK", name: "Alireza Beiranvand", name_ko: "알리레자 베يران반드", dob: "21/09/1992", club: "Tractor (IRN)", club_ko: "트락토르 (이란)", height: "194 cm" }
-                ]
-            },
-            'NZL': {
-                name: "New Zealand", code: "NZL",
-                players: [
-                    { number: "9", position: "FW", name: "Chris Wood", name_ko: "크리스 우드", dob: "07/12/1991", club: "Nottingham Forest (ENG)", club_ko: "노팅엄 포레스트 (잉글랜드)", height: "191 cm" },
-                    { number: "3", position: "DF", name: "Liberato Cacace", name_ko: "리베라토 카카체", dob: "27/09/2000", club: "Empoli (ITA)", club_ko: "엠폴리 (이탈리아)", height: "182 cm" },
-                    { number: "10", position: "MF", name: "Marko Stamenic", name_ko: "마르코 스타메니치", dob: "19/02/2002", club: "Olympiacos (GRE)", club_ko: "올림피아코스 (그리스)", height: "188 cm" },
-                    { number: "8", position: "MF", name: "Sarpreet Singh", name_ko: "사르프리트 싱", dob: "20/02/1999", club: "Unattached", club_ko: "무소속", height: "175 cm" },
-                    { number: "4", position: "DF", name: "Tyler Bindon", name_ko: "타일러 빈돈", dob: "27/01/2005", club: "Reading FC (ENG)", club_ko: "레딩 FC (잉글랜드)", height: "186 cm" },
-                    { number: "12", position: "GK", name: "Alex Paulsen", name_ko: "알렉스 폴센", dob: "04/07/2002", club: "Auckland FC (NZL)", club_ko: "오클랜드 FC (뉴질랜드)", height: "185 cm" }
-                ]
-            },
-            'ESP': {
-                name: "Spain", code: "ESP",
-                players: [
-                    { number: "19", position: "FW", name: "Lamine Yamal", name_ko: "라민 야말 (원더키드)", dob: "13/07/2007", club: "FC Barcelona (ESP)", club_ko: "FC 바르셀로나 (스페인)", height: "180 cm" },
-                    { number: "17", position: "FW", name: "Nico Williams", name_ko: "니코 윌리엄스", dob: "12/07/2002", club: "Athletic Bilbao (ESP)", club_ko: "아틀레틱 빌바오 (스페인)", height: "181 cm" },
-                    { number: "16", position: "MF", name: "Rodri", name_ko: "로드리", dob: "22/06/1996", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "191 cm" },
-                    { number: "20", position: "MF", name: "Pedri", name_ko: "페드리", dob: "25/11/2002", club: "FC Barcelona (ESP)", club_ko: "FC 바르셀로나 (스페인)", height: "174 cm" },
-                    { number: "10", position: "MF", name: "Dani Olmo", name_ko: "다니 올모", dob: "07/05/1998", club: "FC Barcelona (ESP)", club_ko: "FC 바르셀로나 (스페인)", height: "179 cm" },
-                    { number: "7", position: "FW", name: "Alvaro Morata", name_ko: "알바로 모라타", dob: "23/10/1992", club: "AC Milan (ITA)", club_ko: "AC 밀란 (이탈리아)", height: "189 cm" }
-                ]
-            },
-            'CPV': {
-                name: "Cabo Verde", code: "CPV",
-                players: [
-                    { number: "1", position: "GK", name: "Vozinha", name_ko: "보지냐", dob: "03/06/1986", club: "Trencin (SVK)", club_ko: "AS 트렌친 (슬로바키아)", height: "189 cm" },
-                    { number: "10", position: "FW", name: "Ryan Mendes", name_ko: "라이언 멘데스", dob: "08/01/1990", club: "Karagumruk (TUR)", club_ko: "카라귬뤼크 (튀르키예)", height: "179 cm" },
-                    { number: "11", position: "FW", name: "Garry Rodrigues", name_ko: "가리 로드리게스", dob: "27/11/1990", club: "Sivasspor (TUR)", club_ko: "시바스스포르 (튀르키예)", height: "175 cm" },
-                    { number: "4", position: "DF", name: "Logan Costa", name_ko: "로간 코스타", dob: "01/04/2001", club: "Villarreal CF (ESP)", club_ko: "비야레알 CF (스페인)", height: "190 cm" },
-                    { number: "7", position: "FW", name: "Jovane Cabral", name_ko: "조반 카브랄", dob: "14/06/1998", club: "Estrela Amadora (POR)", club_ko: "에스트렐라 아마도라 (포르투갈)", height: "174 cm" },
-                    { number: "18", position: "FW", name: "Bebe", name_ko: "베베", dob: "12/07/1990", club: "Racing Ferrol (ESP)", club_ko: "라싱 페롤 (스페인)", height: "190 cm" }
-                ]
-            },
-            'KSA': {
-                name: "Saudi Arabia", code: "KSA",
-                players: [
-                    { number: "10", position: "MF", name: "Salem Al-Dawsari", name_ko: "살렘 알 도사리", dob: "19/08/1991", club: "Al Hilal (KSA)", club_ko: "알 힐랄 (사우디)", height: "171 cm" },
-                    { number: "12", position: "DF", name: "Saud Abdulhamid", name_ko: "사우드 압둘하미드", dob: "18/07/1999", club: "Lens (FRA)", club_ko: "RC 랑스 (프랑스)", height: "175 cm" },
-                    { number: "9", position: "FW", name: "Firas Al-Buraikan", name_ko: "피라스 알부라이칸", dob: "14/05/2000", club: "Al Ahli (KSA)", club_ko: "알 아흘리 (사우디)", height: "182 cm" },
-                    { number: "8", position: "MF", name: "Mohamed Kanno", name_ko: "모하메드 칸노", dob: "22/09/1994", club: "Al Hilal (KSA)", club_ko: "알 힐랄 (사우디)", height: "192 cm" },
-                    { number: "5", position: "DF", name: "Ali Al-Bulayhi", name_ko: "알리 알불라이히", dob: "21/11/1989", club: "Al Hilal (KSA)", club_ko: "알 힐랄 (사우디)", height: "182 cm" },
-                    { number: "21", position: "GK", name: "Mohammed Al-Owais", name_ko: "모하메드 알오와이스", dob: "10/10/1991", club: "Al Hilal (KSA)", club_ko: "알 힐랄 (사우디)", height: "185 cm" }
-                ]
-            },
-            'URU': {
-                name: "Uruguay", code: "URU",
-                players: [
-                    { number: "15", position: "MF", name: "Federico Valverde", name_ko: "페데리코 발베르데", dob: "22/07/1998", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "182 cm" },
-                    { number: "19", position: "FW", name: "Darwin Nunez", name_ko: "다윈 누녜스", dob: "24/06/1999", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "187 cm" },
-                    { number: "4", position: "DF", name: "Ronald Araujo", name_ko: "로날드 아라우호", dob: "07/03/1999", club: "FC Barcelona (ESP)", club_ko: "FC 바르셀로나 (스페인)", height: "188 cm" },
-                    { number: "11", position: "FW", name: "Facundo Pellistri", name_ko: "파쿤도 펠레스트리", dob: "20/12/2001", club: "Panathinaikos (GRE)", club_ko: "파나티나이코스 (그리스)", height: "175 cm" },
-                    { number: "5", position: "MF", name: "Manuel Ugarte", name_ko: "마누엘 우가르테", dob: "11/04/2001", club: "Manchester United (ENG)", club_ko: "맨체스터 유나이티드 (잉글랜드)", height: "182 cm" },
-                    { number: "2", position: "DF", name: "Jose Maria Gimenez", name_ko: "호세 마리아 히메네스", dob: "20/01/1995", club: "Atletico Madrid (ESP)", club_ko: "아틀레티코 마드리드 (스페인)", height: "185 cm" }
-                ]
-            },
-            'FRA': {
-                name: "France", code: "FRA",
-                players: [
-                    { number: "10", position: "FW", name: "Kylian Mbappe", name_ko: "킬리안 음바페", dob: "20/12/1998", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "178 cm" },
-                    { number: "7", position: "FW", name: "Antoine Griezmann", name_ko: "앙투안 그리즈만", dob: "21/03/1991", club: "Atletico Madrid (ESP)", club_ko: "아틀레티코 마드리드 (스페인)", height: "176 cm" },
-                    { number: "18", position: "MF", name: "Warren Zaire-Emery", name_ko: "워렌 자이르-에메리", dob: "08/03/2006", club: "Paris Saint-Germain (FRA)", club_ko: "파리 생제르맹 (프랑스)", height: "178 cm" },
-                    { number: "2", position: "DF", name: "William Saliba", name_ko: "윌리엄 살리바", dob: "24/03/2001", club: "Arsenal FC (ENG)", club_ko: "아스널 FC (잉글랜드)", height: "192 cm" },
-                    { number: "8", position: "MF", name: "Aurelien Tchouameni", name_ko: "오렐리앵 추아메니", dob: "27/01/2000", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "187 cm" },
-                    { number: "6", position: "MF", name: "Eduardo Camavinga", name_ko: "에두아르도 카마빙가", dob: "10/10/2002", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "182 cm" }
-                ]
-            },
-            'SEN': {
-                name: "Senegal", code: "SEN",
-                players: [
-                    { number: "10", position: "FW", name: "Sadio Mane", name_ko: "사디오 마네", dob: "10/04/1992", club: "Al Nassr (KSA)", club_ko: "알 나스르 (사우디)", height: "174 cm" },
-                    { number: "9", position: "FW", name: "Nicolas Jackson", name_ko: "니콜라스 잭슨", dob: "20/06/2001", club: "Chelsea FC (ENG)", club_ko: "첼시 FC (잉글랜드)", height: "186 cm" },
-                    { number: "3", position: "DF", name: "Kalidou Koulibaly", name_ko: "칼리두 쿨리발리", dob: "20/06/1991", club: "Al Hilal (KSA)", club_ko: "알 힐랄 (사우디)", height: "186 cm" },
-                    { number: "16", position: "GK", name: "Edouard Mendy", name_ko: "에두아르도 멘디", dob: "01/03/1992", club: "Al-Ahli (KSA)", club_ko: "알 아흘리 (사우디)", height: "194 cm" },
-                    { number: "5", position: "MF", name: "Idrissa Gueye", name_ko: "이드리사 게예", dob: "26/09/1889", club: "Everton (ENG)", club_ko: "에버턴 FC (잉글랜드)", height: "174 cm" },
-                    { number: "17", position: "MF", name: "Pape Matar Sarr", name_ko: "파프 마타르 사르", dob: "14/09/2002", club: "Tottenham (ENG)", club_ko: "토트넘 홋스퍼 (잉글랜드)", height: "180 cm" }
-                ]
-            },
-            'IRQ': {
-                name: "Iraq", code: "IRQ",
-                players: [
-                    { number: "18", position: "FW", name: "Aymen Hussein", name_ko: "아이멘 후세인", dob: "22/03/1996", club: "Al-Khor (QAT)", club_ko: "알 코르 (카타르)", height: "188 cm" },
-                    { number: "7", position: "FW", name: "Ali Jasim", name_ko: "알리 자심", dob: "20/01/2004", club: "Como 1907 (ITA)", club_ko: "코모 1907 (이탈리아)", height: "178 cm" },
-                    { number: "10", position: "MF", name: "Zidane Iqbal", name_ko: "지단 이크발", dob: "27/04/2003", club: "FC Utrecht (NED)", club_ko: "FC 위트레흐트 (네덜란드)", height: "180 cm" },
-                    { number: "8", position: "MF", name: "Ibrahim Bayesh", name_ko: "이브라힘 바예슈", dob: "24/05/2000", club: "Al-Quwa Al-Jawiya (IRQ)", club_ko: "알 쿠와 알 자위야 (이라크)", height: "177 cm" },
-                    { number: "4", position: "DF", name: "Rebin Sulaka", name_ko: "레빈 술라카", dob: "12/04/1992", club: "Eshkol (THA)", club_ko: "에스콜 FC (태국)", height: "192 cm" },
-                    { number: "1", position: "GK", name: "Jalal Hassan", name_ko: "자랄 하산", dob: "18/05/1987", club: "Al-Zawraa (IRQ)", club_ko: "알 자우라 (이라크)", height: "187 cm" }
-                ]
-            },
-            'NOR': {
-                name: "Norway", code: "NOR",
-                players: [
-                    { number: "9", position: "FW", name: "Erling Haaland", name_ko: "엘링 홀란 (황소)", dob: "21/07/2000", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "194 cm" },
-                    { number: "10", position: "MF", name: "Martin Odegaard", name_ko: "마르틴 외데고르", dob: "17/12/1998", club: "Arsenal FC (ENG)", club_ko: "아스널 FC (잉글랜드)", height: "178 cm" },
-                    { number: "19", position: "FW", name: "Alexander Sorloth", name_ko: "알렉산더 쇠를로트", dob: "05/12/1995", club: "Atletico Madrid (ESP)", club_ko: "아틀레티코 마드리드 (스페인)", height: "195 cm" },
-                    { number: "11", position: "FW", name: "Antonio Nusa", name_ko: "안토니오 누사", dob: "17/04/2005", club: "RB Leipzig (GER)", club_ko: "RB 라이프치히 (독일)", height: "180 cm" },
-                    { number: "6", position: "MF", name: "Sander Berge", name_ko: "산데르 베르게", dob: "14/02/1998", club: "Fulham FC (ENG)", club_ko: "풀럼 FC (잉글랜드)", height: "195 cm" },
-                    { number: "4", position: "DF", name: "Leo Ostigard", name_ko: "레오 외스티고르", dob: "28/11/1999", club: "Rennes (FRA)", club_ko: "스타드 렌 (프랑스)", height: "184 cm" }
-                ]
-            },
-            'ARG': {
-                name: "Argentina", code: "ARG",
-                players: [
-                    { number: "10", position: "FW", name: "Lionel Messi", name_ko: "리오넬 메시 (GOAT)", dob: "24/06/1987", club: "Inter Miami (USA)", club_ko: "인터 마이애미 (미국)", height: "170 cm" },
-                    { number: "9", position: "FW", name: "Julian Alvarez", name_ko: "훌리안 알바레스", dob: "31/01/2000", club: "Atletico Madrid (ESP)", club_ko: "아틀레티코 마드리드 (스페인)", height: "170 cm" },
-                    { number: "22", position: "FW", name: "Lautaro Martinez", name_ko: "라우타로 마르티네스", dob: "22/08/1997", club: "Inter Milan (ITA)", club_ko: "인터 밀란 (이탈리아)", height: "174 cm" },
-                    { number: "24", position: "MF", name: "Enzo Fernandez", name_ko: "엔조 페르난데스", dob: "17/01/2001", club: "Chelsea FC (ENG)", club_ko: "첼시 FC (잉글랜드)", height: "178 cm" },
-                    { number: "20", position: "MF", name: "Alexis Mac Allister", name_ko: "알렉시스 맥 알리스타", dob: "24/12/1998", club: "Liverpool (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "176 cm" },
-                    { number: "13", position: "DF", name: "Cristian Romero", name_ko: "크리스티안 로메로", dob: "27/04/1998", club: "Tottenham (ENG)", club_ko: "토트넘 홋스퍼 (잉글랜드)", height: "185 cm" },
-                    { number: "23", position: "GK", name: "Emiliano Martinez", name_ko: "에밀리아노 마르티네스", dob: "02/09/1992", club: "Aston Villa (ENG)", club_ko: "아스톤 빌라 (잉글랜드)", height: "195 cm" }
-                ]
-            },
-            'ALG': {
-                name: "Algeria", code: "ALG",
-                players: [
-                    { number: "11", position: "FW", name: "Amine Gouiri", name_ko: "아민 구이리", dob: "16/02/2000", club: "Olympique Marseille (FRA)", club_ko: "올랭피크 마르세유 (프랑스)", height: "180 cm" },
-                    { number: "3", position: "DF", name: "Rayan Ait-Nouri", name_ko: "라얀 아이트 누리", dob: "06/06/2001", club: "Manchester City FC (ENG)", club_ko: "맨체스터 시티 FC (잉글랜드)", height: "180 cm" },
-                    { number: "15", position: "GK", name: "Luca Zidane", name_ko: "루카 지단", dob: "13/05/1998", club: "Granada CF (ESP)", club_ko: "그라나다 CF (스페인)", height: "183 cm" },
-                    { number: "7", position: "FW", name: "Riyad Mahrez", name_ko: "리야드 마레즈", dob: "21/02/1991", club: "Al-Ahli (KSA)", club_ko: "알 아흘리 (사우디)", height: "179 cm" },
-                    { number: "8", position: "MF", name: "Houssem Aouar", name_ko: "우셈 아우아르", dob: "30/06/1998", club: "Al-Ittihad (KSA)", club_ko: "알 이티하드 (사우디)", height: "175 cm" },
-                    { number: "21", position: "DF", name: "Ramy Bensebaini", name_ko: "라미 벤세바이니", dob: "16/04/1995", club: "Borussia Dortmund (GER)", club_ko: "보루시아 도르트문트 (독일)", height: "187 cm" }
-                ]
-            },
-            'AUT': {
-                name: "Austria", code: "AUT",
-                players: [
-                    { number: "9", position: "MF", name: "Marcel Sabitzer", name_ko: "마르셀 자비처", dob: "17/03/1994", club: "Borussia Dortmund (GER)", club_ko: "보루시아 도르트문트 (독일)", height: "178 cm" },
-                    { number: "24", position: "MF", name: "Konrad Laimer", name_ko: "콘라트 라이머", dob: "27/05/1997", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "180 cm" },
-                    { number: "19", position: "MF", name: "Christoph Baumgartner", name_ko: "크리스토프 바움가르트너", dob: "01/08/1999", club: "RB Leipzig (GER)", club_ko: "RB 라이프치히 (독일)", height: "180 cm" },
-                    { number: "8", position: "DF", name: "David Alaba", name_ko: "다비드 알라바", dob: "24/06/1992", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "180 cm" },
-                    { number: "11", position: "FW", name: "Michael Gregoritsch", name_ko: "미하엘 그레고리치", dob: "18/04/1994", club: "SC Freiburg (GER)", club_ko: "SC 프라이부르크 (독일)", height: "193 cm" },
-                    { number: "4", position: "DF", name: "Kevin Danso", name_ko: "케빈 단소", dob: "19/09/1998", club: "Lens (FRA)", club_ko: "RC 랑스 (프랑스)", height: "190 cm" }
-                ]
-            },
-            'JOR': {
-                name: "Jordan", code: "JOR",
-                players: [
-                    { number: "10", position: "FW", name: "Mousa Al-Tamari", name_ko: "무사 알 타마리", dob: "10/06/1997", club: "Montpellier (FRA)", club_ko: "몽펠리에 HSC (프랑스)", height: "178 cm" },
-                    { number: "11", position: "FW", name: "Yazan Al-Naimat", name_ko: "야잔 알나이마트", dob: "04/06/1999", club: "Al-Ahli (QAT)", club_ko: "알 아흘리 (카타르)", height: "180 cm" },
-                    { number: "9", position: "FW", name: "Ali Olwan", name_ko: "알리 올완", dob: "26/03/2000", club: "Selangor (MAS)", club_ko: "셀랑고르 FC (말레이시아)", height: "184 cm" },
-                    { number: "14", position: "MF", name: "Nizar Al-Rashdan", name_ko: "니자르 알라시단", dob: "23/03/1999", club: "Al-Faisaly (JOR)", club_ko: "알 파이살리 (요르단)", height: "177 cm" },
-                    { number: "5", position: "DF", name: "Yazan Al-Arab", name_ko: "야잔 알아랍", dob: "31/01/1996", club: "FC Seoul (KOR)", club_ko: "FC 서울 (대한민국)", height: "186 cm" },
-                    { number: "1", position: "GK", name: "Yazid Abu Layla", name_ko: "야지드 아부 라일라", dob: "08/01/1993", club: "Al-Jabalain (KSA)", club_ko: "알 자발라인 (사우디)", height: "187 cm" }
-                ]
-            },
-            'POR': {
-                name: "Portugal", code: "POR",
-                players: [
-                    { number: "7", position: "FW", name: "Cristiano Ronaldo", name_ko: "크리스티아누 호날두 (6회 진출)", dob: "05/02/1985", club: "Al Nassr (KSA)", club_ko: "알 나스르 (사우디)", height: "187 cm" },
-                    { number: "8", position: "MF", name: "Bruno Fernandes", name_ko: "브루노 페르난데스", dob: "08/09/1994", club: "Manchester United (ENG)", club_ko: "맨체스터 유나이티드 (잉글랜드)", height: "179 cm" },
-                    { number: "10", position: "MF", name: "Bernardo Silva", name_ko: "베르나르도 실바", dob: "10/08/1994", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "173 cm" },
-                    { number: "17", position: "FW", name: "Rafael Leao", name_ko: "라파엘 레앙", dob: "10/06/1999", club: "AC Milan (ITA)", club_ko: "AC 밀란 (이탈리아)", height: "188 cm" },
-                    { number: "4", position: "DF", name: "Ruben Dias", name_ko: "후벤 디아스", dob: "14/05/1997", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "187 cm" },
-                    { number: "22", position: "GK", name: "Diogo Costa", name_ko: "디오구 코스타", dob: "19/09/1999", club: "FC Porto (POR)", club_ko: "FC 포르투 (포르투갈)", height: "186 cm" }
-                ]
-            },
-            'COD': {
-                name: "DR Congo", code: "COD",
-                players: [
-                    { number: "20", position: "FW", name: "Yoane Wissa", name_ko: "요안 위사", dob: "03/09/1996", club: "Brentford FC (ENG)", club_ko: "브렌트포드 FC (잉글랜드)", height: "176 cm" },
-                    { number: "22", position: "DF", name: "Chancel Mbemba", name_ko: "찬셀 음벰바", dob: "08/08/1994", club: "Marseille (FRA)", club_ko: "올랭피크 마르세유 (프랑스)", height: "182 cm" },
-                    { number: "8", position: "MF", name: "Samuel Moutoussamy", name_ko: "사뮈엘 무투사미", dob: "12/08/1996", club: "Sivasspor (TUR)", club_ko: "시바스스포르 (튀르키예)", height: "177 cm" },
-                    { number: "13", position: "FW", name: "Meschack Elia", name_ko: "메샤크 엘리아", dob: "06/08/1997", club: "Young Boys (SUI)", club_ko: "BSC 영 보이스 (스위스)", height: "173 cm" },
-                    { number: "3", position: "DF", name: "Arthur Masuaku", name_ko: "아르튀르 마쉬아퀴", dob: "07/11/1993", club: "Besiktas (TUR)", club_ko: "베식타스 JK (튀르키예)", height: "179 cm" },
-                    { number: "1", position: "GK", name: "Lionel Mpasi", name_ko: "리오넬 음파시", dob: "01/08/1994", club: "Rodez (FRA)", club_ko: "로데즈 AF (프랑스)", height: "182 cm" }
-                ]
-            },
-            'UZB': {
-                name: "Uzbekistan", code: "UZB",
-                players: [
-                    { number: "14", position: "FW", name: "Eldor Shomurodov", name_ko: "엘도르 쇼무로도프", dob: "29/06/1995", club: "AS Roma (ITA)", club_ko: "AS 로마 (이탈리아)", height: "190 cm" },
-                    { number: "22", position: "MF", name: "Abbosbek Fayzullaev", name_ko: "압보스벡 파이줄라에브", dob: "03/10/2003", club: "CSKA Moscow (RUS)", club_ko: "CSKA 모스크바 (러시아)", height: "167 cm" },
-                    { number: "9", position: "MF", name: "Otabek Shukurov", name_ko: "오타벡 슈쿠로프", dob: "22/06/1996", club: "Al-Fatih (KSA)", club_ko: "알 파티흐 (사우디)", height: "182 cm" },
-                    { number: "10", position: "MF", name: "Jaloliddin Masharipov", name_ko: "잘롤리딘 마샤리포프", dob: "01/09/1993", club: "Esteghlal (IRN)", club_ko: "에스테글랄 (이란)", height: "172 cm" },
-                    { number: "5", position: "DF", name: "Husniddin Aliqulov", name_ko: "후스니딘 알리쿨로프", dob: "04/04/1999", club: "Rizespor (TUR)", club_ko: "리제스포르 (튀르키예)", height: "183 cm" },
-                    { number: "1", position: "GK", name: "Utkir Yusupov", name_ko: "우트키르 유수포프", dob: "04/01/1991", club: "Foolad (IRN)", club_ko: "풀라드 FC (이란)", height: "186 cm" }
-                ]
-            },
-            'COL': {
-                name: "Colombia", code: "COL",
-                players: [
-                    { number: "7", position: "FW", name: "Luis Diaz", name_ko: "루이스 디아스", dob: "13/01/1997", club: "Liverpool FC (ENG)", club_ko: "리버풀 FC (잉글랜드)", height: "180 cm" },
-                    { number: "12", position: "GK", name: "Alvaro Montero", name_ko: "알바로 몬테로 (2.01m 최장신!)", dob: "29/03/1995", club: "Millonarios (COL)", club_ko: "밀요나리오스 (콜롬비아)", height: "201 cm" },
-                    { number: "10", position: "MF", name: "James Rodriguez", name_ko: "하메스 로드리게스", dob: "12/07/1991", club: "Rayo Vallecano (ESP)", club_ko: "라요 바예카노 (스페인)", height: "180 cm" },
-                    { number: "19", position: "FW", name: "Jhon Duran", name_ko: "존 두란", dob: "13/12/2003", club: "Aston Villa (ENG)", club_ko: "아스톤 빌라 (잉글랜드)", height: "185 cm" },
-                    { number: "16", position: "MF", name: "Jefferson Lerma", name_ko: "제퍼슨 레르마", dob: "25/10/1994", club: "Crystal Palace (ENG)", club_ko: "크리스탈 팰리스 (잉글랜드)", height: "179 cm" },
-                    { number: "21", position: "DF", name: "Daniel Munoz", name_ko: "다니엘 무뇨스", dob: "26/05/1996", club: "Crystal Palace (ENG)", club_ko: "크리스탈 팰리스 (잉글랜드)", height: "180 cm" }
-                ]
-            },
-            'ENG': {
-                name: "England", code: "ENG",
-                players: [
-                    { number: "9", position: "FW", name: "Harry Kane", name_ko: "해리 케인 (캡틴)", dob: "28/07/1993", club: "Bayern Munich (GER)", club_ko: "바이에른 뮌헨 (독일)", height: "188 cm" },
-                    { number: "10", position: "MF", name: "Jude Bellingham", name_ko: "주드 벨링엄", dob: "29/06/2003", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "186 cm" },
-                    { number: "4", position: "MF", name: "Declan Rice", name_ko: "데클란 라이스", dob: "14/01/1999", club: "Arsenal FC (ENG)", club_ko: "아스널 FC (잉글랜드)", height: "185 cm" },
-                    { number: "15", position: "DF", name: "Dan Burn", name_ko: "댄 번 (2.01m 필드최장신!)", dob: "09/05/1992", club: "Newcastle United (ENG)", club_ko: "뉴캐슬 유나이티드 (잉글랜드)", height: "201 cm" },
-                    { number: "7", position: "FW", name: "Bukayo Saka", name_ko: "부카요 사카", dob: "05/09/2001", club: "Arsenal FC (ENG)", club_ko: "아스널 FC (잉글랜드)", height: "178 cm" },
-                    { number: "11", position: "FW", name: "Phil Foden", name_ko: "필 포든", dob: "28/05/2000", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "171 cm" }
-                ]
-            },
-            'CRO': {
-                name: "Croatia", code: "CRO",
-                players: [
-                    { number: "10", position: "MF", name: "Luka Modric", name_ko: "루카 모드리치 (라스트댄스)", dob: "09/09/1985", club: "Real Madrid (ESP)", club_ko: "레알 마드리드 (스페인)", height: "172 cm" },
-                    { number: "4", position: "DF", name: "Josko Gvardiol", name_ko: "요슈코 그바르디올", dob: "23/01/2002", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "185 cm" },
-                    { number: "8", position: "MF", name: "Mateo Kovacic", name_ko: "마테오 코바치치", dob: "06/05/1994", club: "Manchester City (ENG)", club_ko: "맨체스터 시티 (잉글랜드)", height: "181 cm" },
-                    { number: "9", position: "FW", name: "Andrej Kramaric", name_ko: "안드레이 크라마리치", dob: "19/06/1991", club: "TSG Hoffenheim (GER)", club_ko: "TSG 호펜하임 (독일)", height: "177 cm" },
-                    { number: "15", position: "MF", name: "Mario Pasalic", name_ko: "마리오 파샬리치", dob: "09/02/1995", club: "Atalanta BC (ITA)", club_ko: "아탈란타 BC (이탈리아)", height: "188 cm" },
-                    { number: "1", position: "GK", name: "Dominik Livakovic", name_ko: "도민크 리바코비치", dob: "09/01/1995", club: "Fenerbahce (TUR)", club_ko: "페네르바체 (튀르키예)", height: "187 cm" }
-                ]
-            },
-            'GHA': {
-                name: "Ghana", code: "GHA",
-                players: [
-                    { number: "10", position: "MF", name: "Mohammed Kudus", name_ko: "모하메드 쿠두스", dob: "02/08/2000", club: "West Ham United (ENG)", club_ko: "웨스트햄 유나이티드 (잉글랜드)", height: "177 cm" },
-                    { number: "19", position: "FW", name: "Inaki Williams", name_ko: "이냐키 윌리엄스", dob: "15/06/1994", club: "Athletic Bilbao (ESP)", club_ko: "아틀레틱 빌바오 (스페인)", height: "186 cm" },
-                    { number: "5", position: "MF", name: "Thomas Partey", name_ko: "토마스 파티", dob: "13/06/1993", club: "Arsenal FC (ENG)", club_ko: "아스널 FC (잉글랜드)", height: "185 cm" },
-                    { number: "9", position: "FW", name: "Jordan Ayew", name_ko: "조던 아유", dob: "11/09/1991", club: "Leicester City (ENG)", club_ko: "레스터 시티 (잉글랜드)", height: "179 cm" },
-                    { number: "25", position: "FW", name: "Antoine Semenyo", name_ko: "앙투안 세메뇨", dob: "07/01/2000", club: "Bournemouth (ENG)", club_ko: "본머스 (잉글랜드)", height: "185 cm" },
-                    { number: "1", position: "GK", name: "Lawrence Ati-Zigi", name_ko: "로렌스 아티 지기", dob: "29/11/1996", club: "St. Gallen (SUI)", club_ko: "장크트갈렌 (스위스)", height: "188 cm" }
-                ]
-            },
-            'PAN': {
-                name: "Panama", code: "PAN",
-                players: [
-                    { number: "10", position: "MF", name: "Cesar Yanis", name_ko: "세사르 야니스 (1.60m 최단신!)", dob: "28/01/1996", club: "San Francisco FC (PAN)", club_ko: "산 프란시스코 FC (파나마)", height: "160 cm" },
-                    { number: "8", position: "MF", name: "Adalberto Carrasquilla", name_ko: "아달베르토 카라스키야", dob: "28/11/1998", club: "Houston Dynamo (USA)", club_ko: "휴스턴 다이나모 (미국)", height: "180 cm" },
-                    { number: "9", position: "FW", name: "Ismael Diaz", name_ko: "이스마엘 디아스", dob: "12/05/1997", club: "Universidad Catolica (ECU)", club_ko: "우니베르시다드 카톨리카 (에콰도르)", height: "180 cm" },
-                    { number: "7", position: "MF", name: "Jose Luis Rodriguez", name_ko: "호세 루이스 로드리게스", dob: "19/06/1998", club: "Juarez (MEX)", club_ko: "FC 후아레스 (멕시코)", height: "180 cm" },
-                    { number: "2", position: "DF", name: "Michael Murillo", name_ko: "마이클 무리요", dob: "11/02/1996", club: "Marseille (FRA)", club_ko: "올랭피크 마르세유 (프랑스)", height: "183 cm" },
-                    { number: "1", position: "GK", name: "Orlando Mosquera", name_ko: "올란도 모스케라", dob: "25/12/1994", club: "Al-Fayha (KSA)", club_ko: "알 파이하 (사우디)", height: "186 cm" }
-                ]
-            }
-        };
-
-        // 전역 상태 변수 관리
-        let state = {
-            countries: { ...SQUAD_DATABASE },
-            selectedCountryCode: null,
-            globalSearchQuery: '',
-            modalSearchQuery: '',
-            modalPositionFilter: 'ALL',
-            viewMode: 'GROUP', 
-            isSampleMode: false
-        };
-
-        // 화면 렌더링 시작
-        function renderApp() {
-            renderDashboardStats();
-            renderCountryCards();
-            updateDataBadge();
-        }
-
-        // 대시보드 보기 설정 전환
-        function setViewMode(mode) {
-            state.viewMode = mode;
-            
-            const gridBtn = document.getElementById('btn-view-GRID');
-            const groupBtn = document.getElementById('btn-view-GROUP');
-            
-            if (mode === 'GRID') {
-                gridBtn.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white transition-all shadow-lg shadow-emerald-500/10";
-                groupBtn.className = "px-4 py-2 text-xs font-semibold rounded-xl hover:bg-slate-900 text-slate-300 border border-slate-800 transition-all";
-            } else {
-                gridBtn.className = "px-4 py-2 text-xs font-semibold rounded-xl hover:bg-slate-900 text-slate-300 border border-slate-800 transition-all";
-                groupBtn.className = "px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white transition-all shadow-lg shadow-emerald-500/10";
-            }
-            
-            renderCountryCards();
-        }
-
-        // 전체 대시보드 종합 지표 연산 및 주입
-        function renderDashboardStats() {
-            const countryKeys = Object.keys(state.countries);
-            let totalPlayers = 0;
-            let sumHeight = 0;
-            let heightCount = 0;
-
-            countryKeys.forEach(code => {
-                const squad = state.countries[code].players;
-                totalPlayers += squad.length;
-                squad.forEach(p => {
-                    if (p.height) {
-                        const hVal = parseFloat(p.height);
-                        if (!isNaN(hVal)) {
-                            sumHeight += hVal;
-                            heightCount++;
-                        }
-                    }
-                });
-            });
-
-            document.getElementById('stat-players').innerText = `${totalPlayers}명 수록`;
-            const avgHeight = heightCount > 0 ? (sumHeight / heightCount).toFixed(1) : '181.7';
-            document.getElementById('stat-avg-height').innerText = `${avgHeight} cm`;
-        }
-
-        // 수동 리로드 시 배지 변경 처리
-        function updateDataBadge() {
-            const badge = document.getElementById('data-status-badge');
-            if (state.isSampleMode) {
-                badge.className = "px-3 py-1.5 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>대기 상태`;
-            } else {
-                badge.className = "px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span>실시간 48개국 명장 내장됨`;
-            }
-        }
-
-        // 개별 국가 전력 분석 카드 디자인 빌더
-        function createCountryCard(code, country) {
-            const flag = getFlagEmoji(code);
-            const krName = countryKoMap[code] || country.name;
-            const squadSize = country.players.length;
-
-            const posCounts = { GK: 0, DF: 0, MF: 0, FW: 0 };
-            country.players.forEach(p => {
-                if (posCounts[p.position] !== undefined) {
-                    posCounts[p.position]++;
-                }
-            });
-
-            const card = document.createElement('div');
-            card.className = "bg-slate-900/40 hover:bg-slate-900/80 border border-slate-900 hover:border-emerald-500/50 rounded-2xl p-5 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 shadow-lg flex flex-col justify-between group";
-            card.onclick = () => openSquadModal(code);
-
-            const squadBadge = `<span class="text-xs font-bold text-emerald-400">${squadSize}명 로드완료</span>`;
-
-            card.innerHTML = `
-                <div>
-                    <!-- 국기 및 피파 코드 -->
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-3xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300 select-none">${flag}</span>
-                        <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-800 text-slate-400 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-colors">${code}</span>
-                    </div>
-
-                    <!-- 국가 한글명/영문명 -->
-                    <h3 class="text-base font-bold text-slate-100 group-hover:text-emerald-400 transition-colors truncate">${krName}</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5 truncate">${country.name}</p>
-                </div>
-
-                <!-- 통계 분포 뱃지 -->
-                <div class="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between">
-                    <span class="text-[11px] text-slate-500">엔트리 명단</span>
-                    ${squadBadge}
-                </div>
-
-                <!-- 포지션 일람표 -->
-                <div class="grid grid-cols-4 gap-1 mt-3 text-center text-[9px] font-bold">
-                    <div class="bg-amber-500/10 text-amber-500 py-1 rounded">GK ${posCounts.GK}</div>
-                    <div class="bg-blue-500/10 text-blue-500 py-1 rounded">DF ${posCounts.DF}</div>
-                    <div class="bg-emerald-500/10 text-emerald-500 py-1 rounded">MF ${posCounts.MF}</div>
-                    <div class="bg-red-500/10 text-red-500 py-1 rounded">FW ${posCounts.FW}</div>
-                </div>
-            `;
-            return card;
-        }
-
-        // 일치 결과 없음 표기 가이드
-        function renderNoResults(grid) {
-            grid.className = "block";
-            grid.innerHTML = `
-                <div class="py-16 flex flex-col items-center justify-center text-slate-500 border border-slate-900 rounded-2xl bg-slate-900/10">
-                    <svg class="w-16 h-16 text-slate-700 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path></svg>
-                    <p class="font-bold text-slate-400 text-sm">일치하는 국가나 선수가 없습니다.</p>
-                    <p class="text-xs text-slate-500 mt-1">철자를 다시 확인하거나 다른 검색어를 입력해보세요.</p>
-                </div>
-            `;
-        }
-
-        // 대시보드 국가 리스트 조별 구성 및 그리드 정비 렌더링
-        function renderCountryCards() {
-            const grid = document.getElementById('country-grid');
-            grid.innerHTML = '';
-
-            const query = state.globalSearchQuery.toLowerCase().trim();
-
-            if (state.viewMode === 'GRID') {
-                grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4";
-                
-                const filteredCountries = Object.keys(state.countries).filter(code => {
-                    const country = state.countries[code];
-                    const krName = countryKoMap[code] || '';
-                    
-                    const matchCountry = country.name.toLowerCase().includes(query) || 
-                                         country.code.toLowerCase().includes(query) || 
-                                         krName.includes(query);
-                    
-                    if (matchCountry) return true;
-
-                    return country.players.some(p => 
-                        (p.name_ko && p.name_ko.includes(query)) ||
-                        p.name.toLowerCase().includes(query) || 
-                        p.club_ko.includes(query) ||
-                        p.club.toLowerCase().includes(query)
-                    );
-                });
-
-                if (filteredCountries.length === 0) {
-                    renderNoResults(grid);
-                    return;
-                }
-
-                filteredCountries.forEach(code => {
-                    const country = state.countries[code];
-                    const card = createCountryCard(code, country);
-                    grid.appendChild(card);
-                });
-
-            } else {
-                // 조별 무대 레이아웃 모드 (A조~L조 편성 기준)
-                grid.className = "space-y-8 block";
-                let totalMatchingGroups = 0;
-
-                Object.keys(GROUPS_CONFIG).forEach(groupLetter => {
-                    const groupTeams = GROUPS_CONFIG[groupLetter];
-                    const filteredTeamsInGroup = groupTeams.filter(code => {
-                        const country = state.countries[code];
-                        if (!country) return false;
-                        const krName = countryKoMap[code] || '';
-                        
-                        const matchCountry = country.name.toLowerCase().includes(query) || 
-                                             country.code.toLowerCase().includes(query) || 
-                                             krName.includes(query);
-                        if (matchCountry) return true;
-                        
-                        return country.players.some(p => 
-                            (p.name_ko && p.name_ko.includes(query)) ||
-                            p.name.toLowerCase().includes(query) || 
-                            (p.club_ko && p.club_ko.includes(query)) ||
-                            p.club.toLowerCase().includes(query)
-                        );
-                    });
-
-                    if (filteredTeamsInGroup.length > 0) {
-                        totalMatchingGroups++;
-                        const groupSection = document.createElement('div');
-                        groupSection.className = "space-y-4 bg-slate-900/10 border border-slate-900/60 p-5 rounded-2xl";
-                        
-                        groupSection.innerHTML = `
-                            <h3 class="text-sm font-extrabold text-emerald-400 flex items-center gap-2 border-b border-slate-900 pb-3">
-                                <span class="px-2 py-0.5 text-xs bg-emerald-600/20 text-emerald-400 rounded border border-emerald-500/20 font-bold">${groupLetter}조</span>
-                                2026 월드컵 Group ${groupLetter}
-                            </h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2"></div>
-                        `;
-                        
-                        const subGrid = groupSection.querySelector('div');
-                        
-                        filteredTeamsInGroup.forEach(code => {
-                            const country = state.countries[code];
-                            const card = createCountryCard(code, country);
-                            subGrid.appendChild(card);
-                        });
-                        
-                        grid.appendChild(groupSection);
-                    }
-                });
-
-                if (totalMatchingGroups === 0) {
-                    renderNoResults(grid);
-                }
-            }
-        }
-
-        // 토스트 알림창 출력
-        function showToast(message, type = "info") {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let bg = "bg-slate-800 border-slate-700";
-            let text = "text-slate-100";
-            if (type === "success") { bg = "bg-emerald-950 border-emerald-800"; text = "text-emerald-300"; }
-            else if (type === "error") { bg = "bg-red-950 border-red-800"; text = "text-red-300"; }
-            else if (type === "info") { bg = "bg-blue-950 border-blue-800"; text = "text-blue-300"; }
-
-            toast.className = `px-4 py-3 rounded-xl border ${bg} ${text} text-xs font-semibold shadow-xl flex items-center gap-2 transform translate-y-2 opacity-0 transition-all duration-300`;
-            toast.innerHTML = `
-                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                <span>${message}</span>
-            `;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
-
-        // 상세 스쿼드 모달 제어 - 열기
-        function openSquadModal(code) {
-            state.selectedCountryCode = code;
-            state.modalSearchQuery = '';
-            state.modalPositionFilter = 'ALL';
-            
-            document.getElementById('modal-search').value = '';
-
-            const country = state.countries[code];
-            const krName = countryKoMap[code] || country.name;
-
-            // 모달 정보 기입
-            document.getElementById('modal-country-flag').innerText = getFlagEmoji(code);
-            document.getElementById('modal-country-name-ko').innerText = krName;
-            document.getElementById('modal-country-name-en').innerText = country.name;
-            document.getElementById('modal-country-code').innerText = code;
-
-            setModalPositionFilter('ALL');
-
-            const modal = document.getElementById('squad-modal');
-            modal.classList.remove('pointer-events-none', 'opacity-0');
-            modal.firstElementChild.classList.remove('scale-95');
-            modal.firstElementChild.classList.add('scale-100');
-
-            renderModalSquad();
-        }
-
-        function closeSquadModal() {
-            const modal = document.getElementById('squad-modal');
-            modal.classList.add('pointer-events-none', 'opacity-0');
-            modal.firstElementChild.classList.remove('scale-100');
-            modal.firstElementChild.classList.add('scale-95');
-            state.selectedCountryCode = null;
-        }
-
-        // Esc 키 이벤트
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && state.selectedCountryCode) {
-                closeSquadModal();
-            }
+            tabsBox.appendChild(btn);
         });
 
-        // 모달 포지션 탭 교환기
-        function setModalPositionFilter(pos) {
-            state.modalPositionFilter = pos;
-            
-            ['ALL', 'GK', 'DF', 'MF', 'FW'].forEach(p => {
-                const tab = document.getElementById(`tab-pos-${p}`);
-                if (tab) {
-                    tab.className = "px-4 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 text-slate-300 transition-colors shrink-0";
-                }
-            });
+        // 2. 초기 기본 국가 데이터 로딩 (프랑스)
+        renderSquad(firstCode);
+    });
 
-            const activeTab = document.getElementById(`tab-pos-${pos}`);
-            if (activeTab) {
-                activeTab.className = "px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-colors shrink-0";
-            }
+    // 탭 변경 제어 함수
+    function switchTab(code, targetBtn) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        targetBtn.classList.add('active');
+        renderSquad(code);
+    }
 
-            renderModalSquad();
-        }
+    // 선수단 목록 화면 출력 함수
+    function renderSquad(code) {
+        const country = worldCupSquads[code];
+        document.getElementById('countryTitle').innerText = `${country.flag} ${country.name} (FIFA 랭킹 ${country.rank})`;
 
-        // 모달 내 한글 중심 스쿼드 레이아웃 갱신 및 주입
-        function renderModalSquad() {
-            if (!state.selectedCountryCode) return;
+        const displayArea = document.getElementById('squadDisplay');
+        displayArea.innerHTML = ""; // 기존 출력 노드 초기화
 
-            const country = state.countries[state.selectedCountryCode];
-            const squad = country.players;
-            const krName = countryKoMap[state.selectedCountryCode] || country.name;
+        // 포지션 배열 반복 처리 (GK ➔ DF ➔ MF ➔ FW 순)
+        positions.forEach(pos => {
+            const players = country[pos.key] || [];
+            if(players.length === 0) return;
 
-            const tBody = document.getElementById('modal-squad-table-body');
-            const mList = document.getElementById('modal-squad-mobile-list');
-            const emptyState = document.getElementById('modal-empty-state');
-            const distBar = document.getElementById('position-distribution-bar');
+            const section = document.createElement('div');
+            section.className = "position-group";
 
-            // 예외처리: 선수가 전혀 없는 국가의 안내 구조 디자인
-            if (squad.length === 0) {
-                emptyState.innerHTML = `
-                    <div class="flex flex-col items-center py-6">
-                        <p class="font-extrabold text-slate-200 text-base mb-1">${krName} 선수단 수집 진행중</p>
-                        <p class="text-xs text-slate-500 max-w-sm">해당 국가 대표팀 로스터 데이터를 보정 수집 중입니다.</p>
+            const badge = document.createElement('span');
+            badge.className = `position-title ${pos.badge}`;
+            badge.innerText = pos.title;
+            section.appendChild(badge);
+
+            const grid = document.createElement('div');
+            grid.className = "players-grid";
+
+            // 해당 포지션 소속 선수 카드 동적 주입
+            players.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "player-card";
+                card.innerHTML = `
+                    <div class="player-num">${p.n}</div>
+                    <div class="player-details">
+                        <div class="player-name">${p.p}</div>
+                        <div class="player-club">${p.c || p.club}</div>
                     </div>
                 `;
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-                tBody.innerHTML = '';
-                mList.innerHTML = '';
-                distBar.innerHTML = `<div class="w-full bg-slate-800 h-full"></div>`;
-                return;
-            }
-
-            // 포지션 분포 분석
-            const counts = { GK: 0, DF: 0, MF: 0, FW: 0 };
-            let totalHeight = 0;
-            let heightCount = 0;
-
-            squad.forEach(p => {
-                if (counts[p.position] !== undefined) counts[p.position]++;
-                if (p.height) {
-                    const hVal = parseFloat(p.height);
-                    if (!isNaN(hVal)) {
-                        totalHeight += hVal;
-                        heightCount++;
-                    }
-                }
+                grid.appendChild(card);
             });
 
-            const total = squad.length || 1;
-            const gkPct = ((counts.GK / total) * 100).toFixed(1);
-            const dfPct = ((counts.DF / total) * 100).toFixed(1);
-            const mfPct = ((counts.MF / total) * 100).toFixed(1);
-            const fwPct = ((counts.FW / total) * 100).toFixed(1);
-
-            distBar.innerHTML = `
-                <div style="width: ${gkPct}%" class="bg-amber-500 h-full" title="GK: ${counts.GK}명"></div>
-                <div style="width: ${dfPct}%" class="bg-blue-500 h-full" title="DF: ${counts.DF}명"></div>
-                <div style="width: ${mfPct}%" class="bg-emerald-500 h-full" title="MF: ${counts.MF}명"></div>
-                <div style="width: ${fwPct}%" class="bg-red-500 h-full" title="FW: ${counts.FW}명"></div>
-            `;
-
-            const avgHeight = heightCount > 0 ? (totalHeight / heightCount).toFixed(1) : '182.4';
-            document.getElementById('modal-stat-summary').innerText = 
-                `등록 선수: ${total}명 | 평균 신장: ${avgHeight} cm (GK: ${counts.GK} | DF: ${counts.DF} | MF: ${counts.MF} | FW: ${counts.FW})`;
-
-            const query = state.modalSearchQuery.toLowerCase().trim();
-            const filteredPlayers = squad.filter(p => {
-                if (state.modalPositionFilter !== 'ALL' && p.position !== state.modalPositionFilter) {
-                    return false;
-                }
-                if (query !== '') {
-                    return (
-                        (p.name_ko && p.name_ko.includes(query)) ||
-                        p.name.toLowerCase().includes(query) ||
-                        (p.club_ko && p.club_ko.includes(query)) ||
-                        p.club.toLowerCase().includes(query)
-                    );
-                }
-                return true;
-            });
-
-            tBody.innerHTML = '';
-            mList.innerHTML = '';
-
-            if (filteredPlayers.length === 0) {
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-                return;
-            } else {
-                emptyState.classList.remove('flex');
-                emptyState.classList.add('hidden');
-            }
-
-            // 명단 뷰어 드로잉 (한글 1순위 노출 구조 설계)
-            filteredPlayers.forEach(p => {
-                let badgeClass = "bg-slate-800 text-slate-300";
-                if (p.position === 'GK') badgeClass = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
-                else if (p.position === 'DF') badgeClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
-                else if (p.position === 'MF') badgeClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                else if (p.position === 'FW') badgeClass = "bg-red-500/10 text-red-400 border border-red-500/20";
-
-                // 데스크톱 표 그리기
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/40 transition-all";
-                tr.innerHTML = `
-                    <td class="py-3 px-4 text-center font-bold text-slate-400">${p.number || "-"}</td>
-                    <td class="py-3 px-4">
-                        <span class="px-2 py-0.5 text-[10px] font-extrabold rounded ${badgeClass}">${p.position}</span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <div class="font-extrabold text-slate-100 text-sm">${p.name_ko || p.name}</div>
-                        <div class="text-[10px] text-slate-500 mt-0.5 font-medium">${p.name}</div>
-                    </td>
-                    <td class="py-3 px-4 text-slate-400 text-xs">${p.dob || "-"}</td>
-                    <td class="py-3 px-4">
-                        <div class="font-semibold text-slate-200 text-xs">${p.club_ko || p.club}</div>
-                        <div class="text-[10px] text-slate-500 mt-0.5">${p.club}</div>
-                    </td>
-                    <td class="py-3 px-4 text-right font-bold text-emerald-400 text-xs">${p.height || "-"}</td>
-                `;
-                tBody.appendChild(tr);
-
-                // 모바일 카드 그리기
-                const mCard = document.createElement('div');
-                mCard.className = "bg-slate-950/60 border border-slate-900 p-4 rounded-xl space-y-2.5";
-                mCard.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="w-6 h-6 rounded bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center">${p.number || "-"}</span>
-                            <div>
-                                <span class="text-sm font-bold text-slate-100">${p.name_ko || p.name}</span>
-                                <span class="block text-[9px] text-slate-500">${p.name}</span>
-                            </div>
-                        </div>
-                        <span class="px-2 py-0.5 text-[9px] font-bold rounded ${badgeClass}">${p.position}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-900/60 text-xs text-slate-400">
-                        <div>
-                            <span class="block text-[9px] text-slate-500">소속 클럽</span>
-                            <span class="text-slate-300 font-medium truncate block">${p.club_ko || p.club}</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="block text-[9px] text-slate-500">신장 / 출생</span>
-                            <span class="text-slate-200">${p.height || "-"} | ${p.dob || "-"}</span>
-                        </div>
-                    </div>
-                `;
-                mList.appendChild(mCard);
-            });
-        }
-
-        // PDF 임포터 백업 로직 기동 (사용자가 다른 PDF 스쿼드 삽입 원할 시 수동 구동)
-        function updateLoadingUI(pct, text) {
-            // 로딩 스캔 효과 바 보조
-        }
-
-        function isCountryHeader(line) {
-            const match = line.match(/^\s*([A-Za-z\s'\.-]+)\s*\(([A-Z]{3})\)\s*$/);
-            if (!match) return null;
-            const countryName = match[1].trim();
-            const countryCode = match[2].trim();
-            
-            const noise = ["FIFA", "SQUAD", "LIST", "WORLD", "CUP", "POS", "PLAYER", "FIRST", "LAST", "NAME", "SHIRT", "DOB", "CLUB", "HEIGHT"];
-            if (noise.some(n => countryName.toUpperCase().includes(n))) {
-                return null;
-            }
-            return { name: countryName, code: countryCode };
-        }
-
-        function parseCsvLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current);
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            result.push(current);
-            return result;
-        }
-
-        function parseUnifiedRow(cells) {
-            const cleanCells = cells.map(c => c ? c.trim() : "").filter(c => c !== "");
-            let number = "";
-            let position = "";
-            let name = "";
-            let dob = "";
-            let club = "";
-            let height = "";
-
-            if (cleanCells.length > 0 && /^\d+$/.test(cleanCells[0])) {
-                number = cleanCells[0];
-            }
-
-            cleanCells.forEach(cell => {
-                if (/^\d{3}$/.test(cell)) {
-                    height = cell;
-                }
-                const dobMatch = cell.match(/\b\d{2}\/\d{2}\/\d{4}\b/);
-                if (dobMatch) {
-                    dob = dobMatch[0];
-                    const clubPart = cell.replace(dobMatch[0], '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-                    if (clubPart.length > 3 && !club) {
-                        club = clubPart;
-                    }
-                }
-                const posMatch = cell.match(/\b(GK|DF|MF|FW)\b/i);
-                if (posMatch) {
-                    position = posMatch[1].toUpperCase();
-                    const namePart = cell.replace(/\b(GK|DF|MF|FW)\b/i, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-                    if (namePart.length > 3 && !name) {
-                        name = namePart;
-                    }
-                }
-            });
-
-            if (!name) {
-                for (let i = 1; i < cleanCells.length; i++) {
-                    const cell = cleanCells[i];
-                    if (cell === position || cell === height || cell === dob || /\([A-Z]{3}\)/.test(cell)) {
-                        continue;
-                    }
-                    if (/^[A-Z\s'\-]{3,}/i.test(cell) && cell.length > 4) {
-                        name = cell.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-                        break;
-                    }
-                }
-            }
-
-            return {
-                number: number || "-",
-                position: position || "Unknown",
-                name: name || "Unknown Player",
-                name_ko: name ? `${name} (수동파싱됨)` : "수동분석 선수",
-                dob: dob || "-",
-                club: club || "Unknown Club",
-                club_ko: club || "수동분석 구단",
-                height: height ? `${height} cm` : "-"
-            };
-        }
-
-        async function loadPDF(arrayBuffer) {
-            showToast("수동 PDF 로드 분석을 개시합니다...", "info");
-            try {
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                const numPages = pdf.numPages;
-                let parsedCountries = {};
-                let currentCountry = null;
-
-                for (let i = 1; i <= numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    const items = textContent.items;
-                    const linesMap = {};
-                    items.forEach(item => {
-                        const y = Math.round(item.transform[5] / 2) * 2;
-                        if (!linesMap[y]) linesMap[y] = [];
-                        linesMap[y].push(item);
-                    });
-
-                    const sortedY = Object.keys(linesMap).sort((a, b) => b - a);
-                    for (const y of sortedY) {
-                        const lineItems = linesMap[y].sort((a, b) => a.transform[4] - b.transform[4]);
-                        const lineText = lineItems.map(item => item.str).join(" ");
-                        
-                        const countryHeader = isCountryHeader(lineText);
-                        if (countryHeader) {
-                            currentCountry = countryHeader.code;
-                            parsedCountries[currentCountry] = {
-                                name: countryHeader.name,
-                                code: countryHeader.code,
-                                players: []
-                            };
-                            continue;
-                        }
-
-                        if (currentCountry) {
-                            if (lineText.includes('"') || lineText.includes(',')) {
-                                const cells = parseCsvLine(lineText);
-                                if (cells.some(c => c.includes("PLAYER NAME") || c.includes("SQUAD LIST"))) {
-                                    continue;
-                                }
-                                const player = parseUnifiedRow(cells);
-                                if (player && player.name !== "Unknown Player" && player.position !== "Unknown") {
-                                    parsedCountries[currentCountry].players.push(player);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (Object.keys(parsedCountries).length > 0) {
-                    for (const code in parsedCountries) {
-                        if (state.countries[code]) {
-                            state.countries[code].players = parsedCountries[code].players;
-                        }
-                    }
-                    showToast("성공적으로 수동 PDF 로스터 병합 완료!", "success");
-                }
-            } catch (error) {
-                showToast("PDF 분석 중 에러가 발생했습니다.", "error");
-            } finally {
-                renderApp();
-            }
-        }
-
-        // ==========================================
-        // 글로벌 바인딩 이벤트 리스너 리스트
-        // ==========================================
-
-        document.getElementById('global-search').addEventListener('input', (e) => {
-            state.globalSearchQuery = e.target.value;
-            renderCountryCards();
+            section.appendChild(grid);
+            displayArea.appendChild(section);
         });
-
-        document.getElementById('modal-search').addEventListener('input', (e) => {
-            state.modalSearchQuery = e.target.value;
-            renderModalSquad();
-        });
-
-        document.getElementById('pdf-file-input').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    loadPDF(evt.target.result);
-                };
-                reader.readAsArrayBuffer(file);
-            }
-        });
-
-        // 초기 수립 기동 모듈
-        window.addEventListener('load', () => {
-            renderApp();
-        });
-    </script>
+    }
+</script>
 </body>
 </html>
