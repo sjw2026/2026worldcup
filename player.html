@@ -3,195 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 월드컵 출전국 명단 (FIFA 랭킹순)</title>
+    <title>FIFA 2026 SQUAD CENTER PRO</title>
     <style>
         :root {
-            --primary: #0f172a;
-            --accent: #2563eb;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --border: #e2e8f0;
-            --text: #334155;
+            --bg-main: #060913;
+            --bg-card: #0f1626;
+            --bg-tab: #141d30;
+            --border-color: #1e293b;
+            --text-pure: #ffffff;
+            --text-main: #e2e8f0;
             --text-muted: #64748b;
-            --gk: #e11d48;
-            --df: #16a34a;
-            --mf: #ea580c;
-            --fw: #d97706;
+            
+            /* 20260605_233709.jpg 핵심 네온 컬러 포인트 */
+            --neon-cyan: #38bdf8;
+            --neon-mint: #10b981;
+            --neon-green: #00f5d4;
+            
+            /* 포지션 대시보드용 포인트 라인 */
+            --gk-glow: #ef4444;
+            --df-glow: #10b981;
+            --mf-glow: #3b82f6;
+            --fw-glow: #f59e0b;
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            /* 테크니컬 그리드 배경 패턴 구현 */
+            background-image: linear-gradient(rgba(30, 41, 59, 0.15) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(30, 41, 59, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
             margin: 0;
             padding: 20px;
-            line-height: 1.5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
+        /* 최상단 메타 배너 라인 */
+        .meta-status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--neon-mint);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background-color: var(--neon-mint);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* 메인 대시보드 헤더 스타일 */
         header {
-            text-align: center;
             margin-bottom: 35px;
+            position: relative;
+        }
+
+        .sub-tag {
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--neon-mint);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
         header h1 {
-            color: var(--primary);
-            font-size: 2.2rem;
-            margin-bottom: 8px;
+            color: var(--neon-cyan);
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            margin: 0 0 12px 0;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
         }
 
         header p {
             color: var(--text-muted);
+            font-size: 1rem;
             margin: 0;
+            max-width: 600px;
         }
 
-        /* 피파 랭킹 네비게이션 탭 */
-        .tabs-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            background: #edd8d8;
-            padding: 10px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            background-color: #f1f5f9;
-            border: 1px solid var(--border);
+        /* 피파 랭킹 순 국가 선택 네비게이션 그리드 */
+        .tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 35px;
         }
 
         .tab-btn {
-            background: none;
-            border: none;
-            padding: 10px 14px;
-            font-size: 0.9rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px;
+            font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text);
+            text-align: center;
             cursor: pointer;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .tab-btn:hover {
-            background: #e2e8f0;
+            border-color: var(--neon-cyan);
+            background-color: var(--bg-tab);
         }
 
         .tab-btn.active {
-            background: var(--accent);
-            color: #ffffff;
+            background: linear-gradient(135deg, #047857 0%, #10b981 100%);
+            border-color: var(--neon-green);
+            color: var(--text-pure);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
-        /* 국가 메인 타이틀 */
-        .country-header {
+        .tab-btn .rank-no {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .tab-btn.active .rank-no {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 컨텐츠 출력 전용 보드 패널 */
+        .dashboard-board {
+            background-color: rgba(15, 22, 38, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .country-title-area {
             font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid var(--primary);
-        }
-
-        /* 포지션 섹션 */
-        .position-group {
+            font-weight: 800;
+            color: var(--text-pure);
             margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .position-title {
-            display: inline-block;
-            padding: 6px 14px;
-            font-size: 0.85rem;
+        /* 포지션 그룹 섹션 라인 */
+        .position-container {
+            margin-bottom: 40px;
+        }
+
+        .position-label {
+            font-size: 0.9rem;
             font-weight: 700;
-            color: #ffffff;
-            border-radius: 20px;
-            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .badge-gk { background-color: var(--gk); }
-        .badge-df { background-color: var(--df); }
-        .badge-mf { background-color: var(--mf); }
-        .badge-fw { background-color: var(--fw); }
+        .pos-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
 
-        /* 선수 카드 그리드 */
-        .players-grid {
+        /* 포지션 고유 글로우 매핑 */
+        .dot-gk { background-color: var(--gk-glow); box-shadow: 0 0 8px var(--gk-glow); }
+        .dot-df { background-color: var(--df-glow); box-shadow: 0 0 8px var(--df-glow); }
+        .dot-mf { background-color: var(--mf-glow); box-shadow: 0 0 8px var(--mf-glow); }
+        .dot-fw { background-color: var(--fw-glow); box-shadow: 0 0 8px var(--fw-glow); }
+
+        /* 대시보드형 스쿼드 카드 레이아웃 */
+        .squad-matrix {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 12px;
         }
 
-        .player-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px;
+        .squad-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            transition: transform 0.15s, box-shadow 0.15s;
+            gap: 16px;
+            transition: all 0.2s ease;
         }
 
-        .player-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        .squad-card:hover {
+            border-color: var(--neon-cyan);
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1);
         }
 
-        .player-num {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            background: #f1f5f9;
-            width: 38px;
-            height: 38px;
+        .jersey-index {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            background: rgba(56, 189, 248, 0.08);
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(56, 189, 248, 0.15);
         }
 
-        .player-details {
+        .meta-profile {
             display: flex;
             flex-direction: column;
         }
 
-        .player-name {
-            font-size: 1rem;
+        .p-name {
+            font-size: 1.05rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--text-pure);
         }
 
-        .player-club {
-            font-size: 0.85rem;
+        .p-club {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 3px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- 대시보드 상태창 상단 바 -->
+    <div class="meta-status-bar">
+        <div class="status-badge">데이터 상태 정상 로드 완료</div>
+        <div>기준 정보: 2026년 월드컵 스쿼드 북</div>
+        <div>제공처: FIFA 공식 본선 데이터북 기반 개편</div>
+    </div>
+
     <header>
-        <h1>🏆 2026 월드컵 본선 스쿼드 데이터 조회기</h1>
-        <p>FIFA 랭킹 1위~17위 진출국 라인업 (포지션별 순차 정렬)</p>
+        <div class="sub-tag">FIFA 2026 북중미 월드컵 명단 대시보드</div>
+        <h1>KST SQUAD CENTER</h1>
+        <p>전세계 최정상 피파 랭킹 주요 국가 축구팀의 본선 출전 최종 엔트리를 대시보드 레이아웃을 통해 직관적이고 완벽하게 모니터링하세요.</p>
     </header>
 
-    <!-- 국가 이동용 탭 컨테이너 -->
-    <div class="tabs-container" id="tabsBox"></div>
+    <!-- 국가 전환 탭 매트릭스 패널 -->
+    <div class="tabs-grid" id="tabsBox"></div>
 
-    <!-- 데이터 출력 본문 -->
-    <main>
-        <div class="country-header" id="countryTitle"></div>
+    <!-- 대시보드 메인 보드 -->
+    <main class="dashboard-board">
+        <div class="country-title-area" id="countryTitle"></div>
         <div id="squadDisplay"></div>
     </main>
 </div>
 
 <script>
-    // 16개 월드컵 진출국의 전체 한글 데이터베이스 정의
+    // 1위부터 17위까지 우루과이 포함 데이터팩 (이탈리아 제외 완벽 반영)
     const worldCupSquads = {
         "FRA": {
             name: "프랑스", rank: "1위", flag: "🇫🇷",
-            GK: [{n:1, p:"브리스 삼바", c:"스타드 렌 (FRA)"}, {n:16, p:"마이크 메냥", c:"AC 밀란 (ITA)"}, {n:23, p:"로빈 리셔", club:"RC 렌스 (FRA)"}],
+            GK: [{n:1, p:"브리스 삼바", c:"스타드 렌 (FRA)"}, {n:16, p:"마이크 메냥", c:"AC 밀란 (ITA)"}, {n:23, p:"로빈 리셔", c:"RC 렌스 (FRA)"}],
             DF: [{n:2, p:"말로 구스토", c:"첼시 (ENG)"}, {n:3, p:"뤼카 디뉴", c:"아스톤 빌라 (ENG)"}, {n:4, p:"다요 우파메카노", c:"바이에른 뮌헨 (GER)"}, {n:5, p:"쥘 쿤데", c:"FC 바르셀로나 (ESP)"}, {n:15, p:"이브라히마 코나테", c:"리버풀 (ENG)"}, {n:17, p:"윌리엄 살리바", c:"아스널 (ENG)"}, {n:19, p:"테오 에르난데스", c:"알 힐랄 (KSA)"}, {n:21, p:"뤼카 에르난데스", c:"파리 생제르맹 (FRA)"}, {n:26, p:"막상스 라크루아", c:"크리스탈 팰리스 (ENG)"}],
             MF: [{n:6, p:"마누 코네", c:"AS 로마 (ITA)"}, {n:8, p:"오렐리앵 추아메니", c:"레알 마드리드 (ESP)"}, {n:13, p:"은골로 캉테", c:"페네르바체 (TUR)"}, {n:14, p:"아드리앵 라비오", c:"AC 밀란 (ITA)"}, {n:18, p:"워렌 자이르-에메리", c:"파리 생제르맹 (FRA)"}, {n:24, p:"라얀 셰르키", c:"맨체스터 시티 (ENG)"}, {n:25, p:"마그네스 아클리우슈", c:"AS 모나코 (FRA)"}],
             FW: [{n:7, p:"우스만 뎀벨레", c:"파리 생제르맹 (FRA)"}, {n:9, p:"마르쿠스 튀람", c:"인테르나치오날레 (ITA)"}, {n:10, p:"킬리안 음바페", c:"레알 마드리드 (ESP)"}, {n:11, p:"마이클 올리세", c:"바이에른 뮌헨 (GER)"}, {n:12, p:"브래들리 바르콜라", c:"파리 생제르맹 (FRA)"}, {n:20, p:"데지레 두에", c:"파리 생제르맹 (FRA)"}, {n:22, p:"장필리프 마테타", c:"크리스탈 팰리스 (ENG)"}]
@@ -201,7 +296,7 @@
             GK: [{n:1, p:"다비드 라야", c:"아스널 (ENG)"}, {n:13, p:"조안 가르시아", c:"FC 바르셀로나 (ESP)"}, {n:23, p:"우나이 시몬", c:"아틀레틱 클루브 (ESP)"}],
             DF: [{n:2, p:"마르크 푸빌", c:"아틀레티코 마드리드 (ESP)"}, {n:3, p:"알렉스 그리말도", c:"바이어 레버쿠젠 (GER)"}, {n:4, p:"에릭 가르시아", c:"FC 바르셀로나 (ESP)"}, {n:5, p:"마르코스 요렌테", c:"아틀레티코 마드리드 (ESP)"}, {n:12, p:"페드로 포로", c:"토트넘 홋스퍼 (ENG)"}, {n:14, p:"아이메릭 라포르트", c:"아틀레틱 클루브 (ESP)"}, {n:22, p:"파우 쿠바르시", c:"FC 바르셀로나 (ESP)"}, {n:24, p:"마르크 쿠쿠렐랴", c:"첼시 (ENG)"}],
             MF: [{n:6, p:"미켈 메리노", c:"아스널 (ENG)"}, {n:8, p:"파비안 루이스", c:"파리 생제르맹 (FRA)"}, {n:9, p:"가비", c:"FC 바르셀로나 (ESP)"}, {n:15, p:"알렉스 바에나", c:"아틀레티코 마드리드 (ESP)"}, {n:16, p:"로드리", c:"맨체스터 시티 (ENG)"}, {n:18, p:"마르틴 수비멘디", c:"아스널 (ENG)"}, {n:20, p:"페드리", c:"FC 바르셀로나 (ESP)"}],
-            FW: [{n:7, p:"페란 토레스", c:"FC 바르셀로나 (ESP)"}, {n:10, p:"다니 올모", c:"FC 바르셀로나 (ESP)"}, {n:11, p:"예레미 피노", c:"크리스탈 팰리스 (ENG)"}, {n:17, p:"니코 윌리엄스", c:"아틀레틱 클루브 (ESP)"}, {n:19, p:"라민 야말", c:"FC 바르셀로나 (ESP)"}, {n:21, p:"미켈 오야르사발", c:"레알 소시에다드 (ESP)"}, {n:25, p:"빅토르 무뇨스", c:"CA 오사수나 (ESP)"}, {n:26, p:"보르하 이글레시아스", c:"RC Celta Vigo (ESP)"}]
+            FW: [{n:7, p:"페란 토레스", c:"FC 바르셀로나 (ESP)"}, {n:10, p:"다니 올모", c:"FC 바르셀로나 (ESP)"}, {n:11, p:"예레미 피노", c:"크리스탈 팰리스 (ENG)"}, {n:17, p:"니코 윌리엄스", c:"아틀레틱 클루브 (ESP)"}, {n:19, p:"라민 야말", c:"FC 바르셀로나 (ESP)"}, {n:21, p:"미켈 오야르사발", c:"레알 소시에다드 (ESP)"}, {n:25, p:"빅토르 무뇨스", c:"CA 오사수나 (ESP)"}, {n:26, p:"보르하 이글레시아스", c:"RC 셀타 비고 (ESP)"}]
         },
         "ARG": {
             name: "아르헨티나", rank: "3위", flag: "🇦🇷",
@@ -229,7 +324,7 @@
             GK: [{n:1, p:"알리송 베커", c:"리버풀 FC (ENG)"}, {n:12, p:"웨베르통", c:"그레미우 (BRA)"}, {n:23, p:"에데르송", c:"페네르바체 SK (TUR)"}],
             DF: [{n:2, p:"웨슬리", c:"AS 로마 (ITA)"}, {n:3, p:"가브리엘 마갈량이스", c:"아스널 FC (ENG)"}, {n:4, p:"마르퀴뉴스", c:"파리 생제르맹 (FRA)"}, {n:6, p:"알렉스 산드로", c:"CR 플라멩구 (BRA)"}, {n:13, p:"다닐루", c:"CR 플라멩구 (BRA)"}, {n:14, p:"글레이송 브레메르", c:"유벤투스 FC (ITA)"}, {n:15, p:"레오 페레이라", c:"CR 플라멩구 (BRA)"}, {n:16, p:"더글라스 산토스", c:"제니트 (RUS)"}, {n:24, p:"로저 이바녜스", c:"알 아흘리 FC (KSA)"}],
             MF: [{n:5, p:"카세미루", c:"맨체스터 유나이티드 (ENG)"}, {n:8, p:"브루누 기마랑이스", c:"뉴캐슬 유나이티드 (ENG)"}, {n:17, p:"파비뉴", c:"알 이티하드 (KSA)"}, {n:18, p:"다닐루 산토스", c:"보타포구 (BRA)"}, {n:20, p:"루카스 파케타", c:"CR 플라멩구 (BRA)"}],
-            FW: [{n:7, p:"비니시우스 주니어", c:"레알 마드리드 (ESP)"}, {n:9, p:"마테우스 쿠냐", c:"맨체스터 유나이티드 (ENG)"}, {n:10, p:"네이마르 주니어", c:"산투스 FC (BRA)"}, {n:11, p:"하피냐", c:"FC 바르셀로나 (ESP)"}, {n:19, p:"엔드릭", c:"올랭피크 리옹 (FRA)"}, {n:21, p:"루이스 엔리케", c:"제니트 (RUS)"}, {n:22, p:"가브리엘 마르티네리", c:"아스널 FC (ENG)"}, {n:25, p:"이호르 치아구", c:"브렌트포드 FC (ENG)"}, {n:26, p:"하얀", c:"AFC 본머 (ENG)"}]
+            FW: [{n:7, p:"비니시우스 주니어", c:"레알 마드리드 (ESP)"}, {n:9, p:"마테우스 쿠냐", c:"맨체스터 유나이티드 (ENG)"}, {n:10, p:"네이마르 주니어", c:"산투스 FC (BRA)"}, {n:11, p:"하피냐", c:"FC 바르셀로나 (ESP)"}, {n:19, p:"엔드릭", c:"올랭피크 리옹 (FRA)"}, {n:21, p:"루이스 엔리케", c:"제니트 (RUS)"}, {n:22, p:"가브리엘 마르티네리", c:"아스널 FC (ENG)"}, {n:25, p:"이호르 치아구", c:"브렌트포드 FC (ENG)"}, {n:26, p:"하얀", c:"AFC 본머스 (ENG)"}]
         },
         "NED": {
             name: "네덜란드", rank: "7위", flag: "🇳🇱",
@@ -276,7 +371,7 @@
         "SEN": {
             name: "세네갈", rank: "14위", flag: "🇸🇳",
             GK: [{n:1, p:"예반 디우프", c:"OGC 니스 (FRA)"}, {n:16, p:"에두아르 멘디", c:"알 아흘리 FC (KSA)"}, {n:23, p:"모리 디아우", c:"Le Havre AC (FRA)"}],
-            DF: [{n:2, p:"마마두 사르", c:"첼시 FC (ENG)"}, {n:3, p:"칼리두 쿨리발리", c:"알 힐랄 SC (KSA)"}, {n:4, p:"압둘라예 세크", c:"마카비 하이파 (ISR)"}, {n:14, p:"이스마일 야콥스", c:"갈라타사라이 SK (TUR)"}, {n:15, p:"크레팽 디아타", c:"AS 모나코 (FRA)"}, {n:19, p:"무사 니아카테", c:"올랭피크 리옹 (FRA)"}, {n:24, p:"앙투안 멘디", c:"OGC 니스 (FRA)"}, {n:25, p:"엘 하디 디우프", c:"웨스트햄 유나이티드 (ENG)"}],
+            DF: [{n:2, p:"마마두 사르", c:"첼시 FC (ENG)"}, {n:3, p:"칼리두 쿨리발리", c:"알 힐랄 SC (KSA)"}, {n:4, p:"압dul라예 세크", c:"마카비 하이파 (ISR)"}, {n:14, p:"이스마일 야콥스", c:"갈라타사라이 SK (TUR)"}, {n:15, p:"크레팽 디아타", c:"AS 모나코 (FRA)"}, {n:19, p:"무사 니아카테", c:"올랭피크 리옹 (FRA)"}, {n:24, p:"앙투안 멘디", c:"OGC 니스 (FRA)"}, {n:25, p:"엘 하디 디우프", c:"웨스트햄 유나이티드 (ENG)"}],
             MF: [{n:5, p:"이드리사 게예", c:"에버턴 FC (ENG)"}, {n:6, p:"파테 시스", c:"Rayo Vallecano (ESP)"}, {n:8, p:"라민 카마라", c:"AS 모나코 (FRA)"}, {n:17, p:"파페 마타르 사르", c:"토트넘 (ENG)"}, {n:21, p:"하비브 디아라", c:"선덜랜드 AFC (ENG)"}, {n:22, p:"바라 은디아예", c:"바이에른 뮌헨 (GER)"}, {n:26, p:"파페 게예", c:"비야레알 CF (ESP)"}],
             FW: [{n:7, p:"아산 디아오", c:"코모 (ITA)"}, {n:9, p:"밤바 디엥", c:"FC 로리앙 (FRA)"}, {n:10, p:"사디오 마네", c:"알 나스르 FC (KSA)"}, {n:11, p:"니콜라스 잭슨", c:"바이에른 뮌헨 (GER)"}, {n:12, p:"셰리프 은디아예", c:"삼순스포르 (TUR)"}, {n:13, p:"일라만 은디아예", c:"에버턴 FC (ENG)"}, {n:18, p:"이스마일라 사르", c:"크리스탈 팰리스 (ENG)"}, {n:20, p:"이브라히마 음바예", c:"파리 생제르맹 (FRA)"}]
         },
@@ -292,95 +387,93 @@
             GK: [{n:1, p:"멧 터너", c:"뉴잉글랜드 레볼루션 (USA)"}, {n:24, p:"멧 프리즈", c:"뉴욕 시티 FC (USA)"}, {n:25, p:"크리스 브레이디", c:"시카고 파이어 (USA)"}],
             DF: [{n:2, p:"세르지뇨 데스트", c:"PSV 에인트호번 (NED)"}, {n:3, p:"크리스 리차즈", c:"크리스탈 팰리스 (ENG)"}, {n:5, p:"앤토니 로빈슨", c:"풀럼 FC (ENG)"}, {n:6, p:"오스톤 트러스티", c:"셀틱 FC (SCO)"}, {n:12, p:"마일스 로빈슨", c:"FC 신시내티 (USA)"}, {n:13, p:"팀 림", c:"샬럿 FC (USA)"}, {n:16, p:"알렉스 프리먼", c:"비야레알 CF (ESP)"}, {n:18, p:"맥스 아프스텐", c:"콜럼버스 크루 (USA)"}, {n:22, p:"마크 맥켄지", c:"툴루즈 FC (FRA)"}, {n:23, p:"조 스캘리", c:"보루시아 묀헨글라트바흐 (GER)"}],
             MF: [{n:4, p:"타일러 아담스", c:"AFC 본머스 (ENG)"}, {n:7, p:"지오반니 레이나", c:"보루시아 묀헨글라트바흐 (GER)"}, {n:8, p:"웨스턴 맥케니", c:"유벤투스 FC (ITA)"}, {n:14, p:"세바스찬 베어할터", c:"밴쿠버 화이트캡스 (CAN)"}, {n:15, p:"크리스티안 롤단", c:"시애틀 사운더스 (USA)"}, {n:17, p:"말릭 틸만", c:"바이어 레버쿠젠 (GER)"}],
-            FW: [{n:9, p:"리카르도 페피", c:"PSV 에인트호번 (NED)"}, {n:10, p:"크리스티안 풀리식", c:"AC 밀란 (ITA)"}, {n:11, p:"브렌든 에런슨", c:"리즈 유나이티드 (ENG)"}, {n:19, p:"하지 라이트", c:"코번트리 시티 (ENG)"}, {n:20, p:"폴라린 발로건", c:"AS 모나코 (FRA)"}, {n:21, p:"티모시 웨아", c:"올랭피크 마르세유 (FRA)"}, {n:26, p:"알렉스 센데하스", c:"클럽 아메리카 (MEX)"}]
+            FW: [{n:9, p:"리카르도 페피", c:"PSV 에인트호번 (NED)"}, {n:10, p:"크리스티안 풀리식", c:"AC Milan (ITA)"}, {n:11, p:"브렌든 에런슨", c:"리즈 유나이티드 (ENG)"}, {n:19, p:"하지 라이트", c:"코번트리 시티 (ENG)"}, {n:20, p:"폴라린 발로건", c:"AS 모나코 (FRA)"}, {n:21, p:"티모시 웨아", c:"올랭피크 마르세유 (FRA)"}, {n:26, p:"알렉스 센데하스", c:"클럽 아메리카 (MEX)"}]
         },
         "URU": {
             name: "우루과이", rank: "17위", flag: "🇺🇾",
             GK: [{n:1, p:"세르히오 로체트", c:"인테르나시오날 (BRA)"}, {n:12, p:"산티아고 메레", c:"CF 몬테레이 (MEX)"}, {n:23, p:"페르난도 무스레라", c:"에스투디안테스 (ARG)"}],
-            DF: [{n:2, p:"호세 마리아 히메네스", c:"아틀레티코 마드리드 (ESP)"}, {n:3, p:"세바스티안 카세레스", c:"클럽 아메리카 (MEX)"}, {n:4, p:"로날드 아라우호", c:"FC 바르셀로나 (ESP)"}, {n:13, p:"기예르모 바렐라", c:"CR 플라멩구 (BRA)"}, {n:16, p:"마티아스 올리베라", c:"SSC 나폴리 (ITA)"}, {n:17, p:"마티아스 비냐", c:"리버 플레이트 (ARG)"}, {n:24, p:"산티아고 부에노", c:"우드버햄튼 (ENG)"}],
-            MF: [{n:5, p:"마누엘 우가르테", c:"맨체스터 유나이티드 (ENG)"}, {n:6, p:"로드리고 벤탄쿠르", c:"토트넘 (ENG)"}, {n:7, p:"니콜라스 데 라 크루스", c:"CR 플라멩구 (BRA)"}, {n:8, p:"페데리코 발베르데", c:"레알 마드리드 (ESP)"}, {n:10, p:"데 아라스카에타", c:"CR 플라멩구 (BRA)"}, {n:14, p:"아구스틴 카노비오", c:"플루미넨시 (BRA)"}, {n:15, p:"에밀리아노 마르티네스", c:"SE 파우메이라스 (BRA)"}, {n:20, p:"막시 아라우호", c:"스포르팅 CP (POR)"}, {n:22, p:"호아킨 피케레즈", c:"SE 파우메이라스 (BRA)"}, {n:25, p:"후안 사나브리아", c:"리얼 솔트레이크 (USA)"}, {n:26, p:"로드리고 살라사르", c:"SC 브라가 (POR)"}],
+            DF: [{n:2, p:"호세 마리아 히메네스", c:"아틀레티코 마드리드 (ESP)"}, {n:3, p:"세바스티안 카세레스", c:"클럽 아메리카 (MEX)"}, {n:4, p:"로날드 아라우호", c:"FC 바르셀로나 (ESP)"}, {n:13, p:"기예르모 바렐라", c:"CR 플라멩구 (BRA)"}, {n:16, p:"마티아스 올리베라", c:"SSC 나폴리 (ITA)"}, {n:17, p:"마티아스 비냐", c:"리버 플레이트 (ARG)"}, {n:24, p:"산티아고 부에노", c:"울버햄튼 (ENG)"}],
+            MF: [{n:5, p:"마누엘 우가르테", c:"맨체스터 유나이티드 (ENG)"}, {n:6, p:"로드리고 벤탄쿠르", c:"토트넘 (ENG)"}, {n:7, p:"니콜라스 데 라 크루스", c:"CR 플라멩구 (BRA)"}, {n:8, p:"페데리코 발베르데", c:"레알 마드리드 (ESP)"}, {n:10, p:"데 아라스카에타", c:"CR 플라멩구 (BRA)"}, {n:14, p:"아구스틴 카노비오", c:"Fluminense (BRA)"}, {n:15, p:"에밀리아노 마르티네스", c:"SE 파우메이라스 (BRA)"}, {n:20, p:"막시 아라우호", c:"스포르팅 CP (POR)"}, {n:22, p:"호아킨 피케레즈", c:"SE 파우메이라스 (BRA)"}, {n:25, p:"후안 사나브리아", c:"리얼 솔트레이크 (USA)"}, {n:26, p:"로드리고 살라사르", c:"SC 브라가 (POR)"}],
             FW: [{n:9, p:"다윈 누녜스", c:"알 힐랄 SC (KSA)"}, {n:11, p:"파쿤도 펠리스트리", c:"파나티나이코스 (GRE)"}, {n:18, p:"브라이언 로드리게스", c:"클럽 아메리카 (MEX)"}, {n:19, p:"로드리고 아기레", c:"티그레스 UANL (MEX)"}, {n:21, p:"페데리코 비냐스", c:"레알 오비에도 (ESP)"}]
         }
     };
 
-    // 포지션 렌더링 순서 및 설정 정보
-    const positions = [
-        { key: "GK", title: "골키퍼 (GK)", badge: "badge-gk" },
-        { key: "DF", title: "수비수 (DF)", badge: "badge-df" },
-        { key: "MF", title: "미드필더 (MF)", badge: "badge-mf" },
-        { key: "FW", title: "공격수 (FW)", badge: "badge-fw" }
+    const positionConfig = [
+        { key: "GK", title: "골키퍼 / GOALKEEPER", glow: "dot-gk" },
+        { key: "DF", title: "수비수 / DEFENDER", glow: "dot-df" },
+        { key: "MF", title: "미드필더 / MIDFIELDER", glow: "dot-mf" },
+        { key: "FW", title: "공격수 / FORWARD", glow: "dot-fw" }
     ];
 
-    // 초기 실행 환경 구성
     window.addEventListener('DOMContentLoaded', () => {
         const tabsBox = document.getElementById('tabsBox');
         let firstCode = "";
 
-        // 1. 상단 내비게이션 탭 버튼 동적 추가
         Object.keys(worldCupSquads).forEach((code, index) => {
             if(index === 0) firstCode = code;
             const country = worldCupSquads[code];
             
             const btn = document.createElement('button');
             btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-            btn.innerText = `${country.rank} ${country.name}`;
-            btn.setAttribute('data-code', code);
-            btn.onclick = (e) => switchTab(code, e.target);
-            
+            btn.innerHTML = `
+                <span class="rank-no">FIFA RANK ${country.rank}</span>
+                <span>${country.flag} ${country.name}</span>
+            `;
+            btn.onclick = (e) => switchDashboard(code, e.currentTarget);
             tabsBox.appendChild(btn);
         });
 
-        // 2. 초기 기본 국가 데이터 로딩 (프랑스)
-        renderSquad(firstCode);
+        renderDashboard(firstCode);
     });
 
-    // 탭 변경 제어 함수
-    function switchTab(code, targetBtn) {
+    function switchDashboard(code, targetBtn) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         targetBtn.classList.add('active');
-        renderSquad(code);
+        renderDashboard(code);
     }
 
-    // 선수단 목록 화면 출력 함수
-    function renderSquad(code) {
+    function renderDashboard(code) {
         const country = worldCupSquads[code];
-        document.getElementById('countryTitle').innerText = `${country.flag} ${country.name} (FIFA 랭킹 ${country.rank})`;
+        document.getElementById('countryTitle').innerHTML = `
+            <span>${country.flag}</span>
+            <span>${country.name} National Team Squad</span>
+        `;
 
         const displayArea = document.getElementById('squadDisplay');
-        displayArea.innerHTML = ""; // 기존 출력 노드 초기화
+        displayArea.innerHTML = ""; 
 
-        // 포지션 배열 반복 처리 (GK ➔ DF ➔ MF ➔ FW 순)
-        positions.forEach(pos => {
+        positionConfig.forEach(pos => {
             const players = country[pos.key] || [];
             if(players.length === 0) return;
 
-            const section = document.createElement('div');
-            section.className = "position-group";
+            const container = document.createElement('div');
+            container.className = "position-container";
 
-            const badge = document.createElement('span');
-            badge.className = `position-title ${pos.badge}`;
-            badge.innerText = pos.title;
-            section.appendChild(badge);
+            container.innerHTML = `
+                <div class="position-label">
+                    <span class="pos-dot ${pos.glow}"></span>
+                    <span>${pos.title}</span>
+                </div>
+            `;
 
-            const grid = document.createElement('div');
-            grid.className = "players-grid";
+            const matrix = document.createElement('div');
+            matrix.className = "squad-matrix";
 
-            // 해당 포지션 소속 선수 카드 동적 주입
             players.forEach(p => {
                 const card = document.createElement('div');
-                card.className = "player-card";
+                card.className = "squad-card";
                 card.innerHTML = `
-                    <div class="player-num">${p.n}</div>
-                    <div class="player-details">
-                        <div class="player-name">${p.p}</div>
-                        <div class="player-club">${p.c || p.club}</div>
+                    <div class="jersey-index">${p.n}</div>
+                    <div class="meta-profile">
+                        <span class="p-name">${p.p}</span>
+                        <span class="p-club">${p.c}</span>
                     </div>
                 `;
-                grid.appendChild(card);
+                matrix.appendChild(card);
             });
 
-            section.appendChild(grid);
-            displayArea.appendChild(section);
+            container.appendChild(matrix);
+            displayArea.appendChild(container);
         });
     }
 </script>
