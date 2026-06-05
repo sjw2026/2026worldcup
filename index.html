@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 북중미 월드컵 KST 매치 센터 Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'sans-serif'],
+            sports: ['Rajdhani', 'sans-serif'],
+          },
+          colors: {
+            cyber: {
+              black: '#030712',
+              darker: '#090d16',
+              dark: '#0f172a',
+              neon: '#10B981',
+              neonLight: '#34D399',
+              purple: '#8B5CF6',
+              red: '#EF4444',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #030408; background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0, transparent 50%), radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0, transparent 50%), linear-gradient(to bottom, rgba(3, 4, 8, 0.95), rgba(9, 13, 22, 0.98)); color: #f3f4f6; }
+    .neon-pulse-border { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .sporty-panel { background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(9, 13, 22, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); }
+    .horizontal-scroll::-webkit-scrollbar { height: 5px; }
+    .horizontal-scroll::-webkit-scrollbar-thumb { background: #10B981; border-radius: 9999px; }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full px-4"></div>
+
+  <nav class="sticky top-0 z-40 backdrop-blur-md bg-cyber-black/80 border-b border-emerald-500/20 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-tr from-emerald-500 to-cyber-purple p-2.5 rounded-xl text-white shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-ranking-star text-xl"></i>
+        </div>
+        <div>
+          <span class="font-sports font-extrabold text-2xl tracking-wider bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-400 bg-clip-text text-transparent">FIFA 2026</span>
+          <span class="text-[10px] block text-slate-400 font-semibold uppercase tracking-widest">KST MATCH DASHBOARD PRO</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openApiModal()" class="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700 hover:border-emerald-500/50 text-xs text-emerald-400 px-3.5 py-2 rounded-lg transition"><i class="fa-solid fa-circle-nodes"></i><span class="hidden sm:inline">실시간 API</span></button>
+        <button onclick="refreshData()" class="bg-emerald-600 hover:bg-emerald-500 text-white p-2.5 rounded-lg transition"><i id="refresh-icon" class="fa-solid fa-rotate"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <section class="lg:col-span-2 space-y-10">
+      <div id="korea-matches-container" class="grid grid-cols-1 gap-4"></div>
+      <div id="general-matches-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+    
+    <aside class="space-y-8">
+      <div class="sporty-panel p-5 rounded-2xl">
+        <h3 class="text-sm font-extrabold text-slate-200 uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-emerald-500"></i> 출전국 발탁선수 명단</h3>
+        <div class="grid grid-cols-2 gap-2" id="squad-country-grid"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Squad Modal -->
+  <div id="squad-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="bg-gradient-to-r from-emerald-950 to-slate-900 p-5 border-b border-slate-800 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-3">
+          <span id="squad-modal-flag" class="text-3xl"></span>
+          <div>
+            <h3 id="squad-modal-country" class="text-md font-bold text-slate-100"></h3>
+            <p id="squad-modal-meta" class="text-[10px] text-emerald-400 font-semibold"></p>
+          </div>
+        </div>
+        <button onclick="closeSquadModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4" id="squad-modal-players-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const squadsDatabase = {
+      KOR: { name: "대한민국", flag: "🇰🇷", group: "A조", manager: "홍명보", players: { GK: ["조현우 (울산)", "송범근 (쇼난)"], DF: ["김민재 (바이에른)", "설영우 (즈베즈다)"], MF: ["손흥민 (토트넘)", "이강인 (PSG)"], FW: ["황희찬 (울버햄튼)", "오현규 (베식타스)"] } },
+      FRA: { name: "프랑스", flag: "🇫🇷", group: "H조", manager: "디디에 데샹", players: { GK: ["마이크 메냥 (AC밀란)"], DF: ["윌리엄 살리바 (아스날)"], MF: ["에두아르도 카마빙가 (레알)"], FW: ["킬리안 음바페 (레알)"] } },
+      BRA: { name: "브라질", flag: "🇧🇷", group: "C조", manager: "도리바우 주니어", players: { GK: ["에데르송 (맨시티)"], DF: ["마르키뉴스 (PSG)"], MF: ["브루노 기마랑이스 (뉴캐슬)"], FW: ["비니시우스 (레알)"] } },
+      ENG: { name: "잉글랜드", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", group: "G조", manager: "토마스 투헬", players: { GK: ["조던 픽포드 (에버턴)"], DF: ["존 스톤스 (맨시티)"], MF: ["주드 벨링엄 (레알)"], FW: ["해리 케인 (바이에른)"] } }
+    };
+
+    function renderSquadCountries() {
+      const grid = document.getElementById("squad-country-grid");
+      grid.innerHTML = Object.keys(squadsDatabase).map(key => `
+        <button onclick="openSquadModal('${key}')" class="flex items-center gap-2.5 bg-slate-950/60 hover:bg-emerald-950/20 border border-slate-800 p-2.5 rounded-xl transition text-left">
+          <span class="text-2xl">${squadsDatabase[key].flag}</span>
+          <div>
+            <span class="text-xs font-bold text-slate-200 block">${squadsDatabase[key].name}</span>
+            <span class="text-[9px] text-slate-500">${squadsDatabase[key].group}</span>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    function openSquadModal(key) {
+      const s = squadsDatabase[key];
+      document.getElementById("squad-modal-flag").innerText = s.flag;
+      document.getElementById("squad-modal-country").innerText = s.name;
+      document.getElementById("squad-modal-meta").innerText = `${s.group} | 감독: ${s.manager}`;
+      document.getElementById("squad-modal-players-body").innerHTML = Object.entries(s.players).map(([pos, list]) => `
+        <div><h4 class="text-[10px] font-extrabold text-emerald-400 uppercase mb-2">${pos}</h4>
+        <div class="grid grid-cols-2 gap-2">${list.map(p => `<div class="bg-slate-950/60 border border-slate-800 px-3 py-2 rounded-lg text-xs text-slate-200">${p}</div>`).join('')}</div></div>
+      `).join('');
+      document.getElementById("squad-modal").classList.remove("hidden");
+    }
+
+    function closeSquadModal() { document.getElementById("squad-modal").classList.add("hidden"); }
+    
+    window.onload = () => { renderSquadCountries(); };
+    setInterval(() => { console.log("매시간 자동 업데이트 실행"); /* 실제 데이터 갱신 로직이 여기에 위치합니다 */ }, 3600000);
+    function openApiModal() {}
+  </script>
+</body>
+</html>
