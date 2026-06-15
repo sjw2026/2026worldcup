@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
   
   <script>
+    
     tailwind.config = {
       theme: {
         extend: {
@@ -108,7 +109,7 @@
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
       <span class="inline-flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        데이터 조회 기준일시: <strong class="text-slate-200">2026년 6월 5일 16:00 KST</strong> | 제공: <strong class="text-emerald-400">API-Football (공식 본선 일정)</strong>
+        데이터 조회 기준일시: <strong id="last-update-time" class="text-slate-200">2026년 6월 5일 16:00 KST</strong> | 제공: <strong class="text-emerald-400">API-Football (공식 본선 일정)</strong>
       </span>
       <span class="inline-flex items-center gap-1.5 bg-emerald-950/30 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] text-emerald-400 font-semibold animate-pulse">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -716,6 +717,7 @@
       renderStandings();
       renderPlayerStats();
       loadStoredSettings();
+      updateTimestamp();
       
       // 실시간 카운트다운 초당 업데이트
       setInterval(updateAllCountdowns, 1000);
@@ -1353,6 +1355,21 @@
         }
       });
     }
+    function updateTimestamp() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  
+  const timeString = `${year}년 ${month}월 ${date}일 ${hours}:${minutes} KST`;
+  
+  const target = document.getElementById('last-update-time');
+  if (target) {
+    target.innerText = timeString;
+  }
+}
   </script>
 </body>
 </html>
